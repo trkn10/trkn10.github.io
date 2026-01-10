@@ -1,9 +1,56 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <title>こんちは</title>
-  </head>
-  <body>
-    <h1>はろー</h1>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile | My Portfolio</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <header>
+    <div style="font-size:1.3rem;font-weight:bold;">trkn Portfolio</div>
+    <nav>
+      <a href="index.html" class="active">Profile</a>
+      <a href="blog.html">Blog</a>
+      <a href="works.html">Works</a>
+    </nav>
+    <button id="toggle-mode" class="toggle-mode" aria-label="ダーク/ライトモード切替"></button>
+  </header>
+  <main>
+    <h1>Profile</h1>
+    <div class="card odd">
+      <img src="image/profile.png" alt="プロフィール画像" class="card-img">
+      <div>
+        <h2>れもんてぃー</h2>
+        <p>楽しいことが大好きな人間。</p>
+        <p>普段は統合版Minecraftのミニゲームやアドオン開発、ゲーム配信、動画編集、<br>イベント企画をしている。</p>
+        <p>最近の趣味は友達とワイワイ遊ぶこと。</p>
+        <div class="sns-icons" style="margin-top:1.2em; display:flex; gap:1.1em; align-items:center;">
+          <a href="https://github.com/trkn10" target="_blank" rel="noopener" aria-label="GitHub">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub"
+              width="32" height="32" style="vertical-align:middle;">
+          </a>
+          <a href="https://x.com/_trkn10" target="_blank" rel="noopener" aria-label="Twitter">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg" alt="Twitter"
+              width="32" height="32" style="vertical-align:middle;">
+          </a>
+          <a href="https://steamcommunity.com/profiles/76561199163573222/" target="_blank" rel="noopener" aria-label="Steam">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/960px-Steam_icon_logo.svg.png" alt="Steam" width="32" height="32" style="vertical-align:middle;">
+          </a>
+          <a href="https://discord.com/users/834410664009007156" target="_blank" rel="noopener" aria-label="Discord">
+            <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Discord" width="32" height="32"
+              style="vertical-align:middle;">
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="js/main.js"></script>
+  <footer>
+    &copy; 2026 trkn Portfolio. All rights reserved.
+  </footer>
+</body>
+
 </html>
