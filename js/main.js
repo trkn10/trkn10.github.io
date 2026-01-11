@@ -102,4 +102,22 @@ document.addEventListener('DOMContentLoaded', function () {
       pre.appendChild(btn);
     }
   });
+
+  // スクロールで「一番上に戻る」ボタン表示/非表示
+  const scrollBtn = document.getElementById('scrollTopBtn');
+  if (scrollBtn) {
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 200) {
+        scrollBtn.style.display = 'block';
+      } else {
+        scrollBtn.style.display = 'none';
+      }
+    });
+    // 初期状態
+    scrollBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
+    // クリックでスムーズスクロール
+    scrollBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 });
