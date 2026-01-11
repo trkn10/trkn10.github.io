@@ -1,35 +1,40 @@
-/* 一番上に戻るボタン */
 #scrollTopBtn {
   display: none;
   position: fixed;
   right: 2.2em;
   bottom: 2.2em;
   z-index: 200;
-  background: rgba(220,225,235,0.85);
+  background: rgba(220, 225, 235, 0.85);
   color: #2d89ef;
   border: none;
   border-radius: 50%;
   width: 48px;
   height: 48px;
   font-size: 1.7em;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
   cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.18s, background 0.18s, color 0.18s;
 }
-#scrollTopBtn:hover, #scrollTopBtn:focus {
+
+#scrollTopBtn:hover,
+#scrollTopBtn:focus {
   opacity: 1;
   background: #eaf4ff;
   color: #1565c0;
 }
+
 body.dark-mode #scrollTopBtn {
-  background: rgba(40,45,60,0.85);
+  background: rgba(40, 45, 60, 0.85);
   color: #6ec6ff;
 }
-body.dark-mode #scrollTopBtn:hover, body.dark-mode #scrollTopBtn:focus {
+
+body.dark-mode #scrollTopBtn:hover,
+body.dark-mode #scrollTopBtn:focus {
   background: #23272f;
   color: #fff;
 }
+
 .blog-body img.blog-img {
   display: block;
   max-width: 100%;
@@ -104,13 +109,16 @@ body {
   flex-direction: column;
 }
 
+
 main,
 .main {
   flex: 1 0 auto;
   max-width: 800px;
+  min-width: 320px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
 footer {
@@ -574,8 +582,10 @@ body.dark-mode .card {
   }
 
   main {
-    margin: 1rem;
+    margin: 1rem auto;
     padding: 1rem;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   nav {
