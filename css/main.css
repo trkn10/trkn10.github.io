@@ -531,16 +531,18 @@ body.dark-mode .card {
   background: var(--card-bg-dark);
 }
 
-.card-img {
-  flex-shrink: 0;
-  width: 96px;
-  height: 96px;
-  border-radius: 0.6rem;
-  object-fit: cover;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
-  transition: transform 0.25s cubic-bezier(.4, 2, .6, 1), box-shadow 0.25s, filter 0.25s;
-  cursor: pointer;
-}
+  .card-img {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+    transition: transform 0.25s cubic-bezier(.4, 2, .6, 1), box-shadow 0.25s, filter 0.25s;
+    cursor: pointer;
+    max-width: 100%;
+    height: auto;
+  }
 
 .card-img:hover {
   transform: scale(1.12) rotate(-2deg);
