@@ -1,3 +1,53 @@
+// ブログ記事リスト（ここに記事を追加するだけでOK）
+const blogArticles = [
+  { url: '/blogs/20260111/index.html' }
+  // 例: { url: '/blogs/20260112/index.html' }, ...
+];
+
+// ブログ記事一覧を自動生成
+document.addEventListener('DOMContentLoaded', function () {
+  const list = document.getElementById('blog-list');
+  if (!list) return;
+  blogArticles.forEach((article) => {
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h1></h1>
+      <p></p>
+      <time class="blog-date text-gray"></time>
+      <div class="work-tags"></div>
+      <a href="${article.url}">続きを読む</a>
+    `;
+    list.appendChild(card);
+
+    fetch(article.url)
+      .then(res => res.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        // 日付
+        const time = div.querySelector('time');
+        if (time) {
+          const dateElem = card.querySelector('.blog-date');
+          if (dateElem) {
+            dateElem.textContent = time.textContent;
+            dateElem.setAttribute('datetime', time.getAttribute('datetime'));
+          }
+        }
+        // タイトル
+        const h1 = div.querySelector('h1');
+        if (h1) card.querySelector('h1').textContent = h1.textContent;
+        // 本文1行目
+        const firstP = div.querySelector('.blog-body p');
+        if (firstP) card.querySelector('p').textContent = firstP.textContent.split('\n')[0];
+        // タグ
+        const tags = div.querySelector('.blog-tags');
+        if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;
+      });
+  });
+});
+
 // ダーク/ライトモード切り替え
 (function () {
   const modeBtn = document.getElementById('toggle-mode');
@@ -26,7 +76,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.blog-body pre > code').forEach(function (code) {
     const pre = code.parentElement;
-    // すでに行番号が付いている場合はスキップ
+    // 行番号を追加
     if (!pre.querySelector('.code-lines')) {
       const lines = code.textContent.replace(/\n+$/, '').split('\n');
       const lineCount = lines.length;

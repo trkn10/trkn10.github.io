@@ -1,12 +1,99 @@
-/* コードブロックのコピー用ボタン */
+.blog-body img.blog-img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 1.2em 0;
+  border-radius: 0.7em;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  object-fit: contain;
+  transition: none !important;
+  cursor: default;
+}
+
+.blog-body img.blog-img:hover {
+  transform: none !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  filter: none !important;
+}
+
+.text-red {
+  color: #e53935 !important;
+}
+
+.text-pink {
+  color: #d81b60 !important;
+}
+
+.text-purple {
+  color: #8e24aa !important;
+}
+
+.text-blue {
+  color: #1e88e5 !important;
+}
+
+.text-cyan {
+  color: #00acc1 !important;
+}
+
+.text-green {
+  color: #43a047 !important;
+}
+
+.text-orange {
+  color: #fb8c00 !important;
+}
+
+.text-brown {
+  color: #6d4c41 !important;
+}
+
+.text-gray {
+  color: #888 !important;
+}
+
+.text-primary {
+  color: var(--primary) !important;
+}
+
+body.dark-mode .text-gray {
+  color: #aaa !important;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main,
+.main {
+  flex: 1 0 auto;
+  max-width: 800px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
 .blog-body pre {
   position: relative;
 }
+
 .copy-btn {
   position: absolute;
   top: 0.7em;
   right: 1em;
-  background: rgba(220,225,235,0.7);
+  background: rgba(220, 225, 235, 0.7);
   color: #4a5a6a;
   border: none;
   border-radius: 0.4em;
@@ -17,24 +104,31 @@
   transition: opacity 0.18s, background 0.18s;
   z-index: 2;
 }
-.copy-btn:hover, .copy-btn:focus {
+
+.copy-btn:hover,
+.copy-btn:focus {
   opacity: 0.95;
   background: #eaf4ff;
   color: var(--primary);
 }
+
 body.dark-mode .copy-btn {
-  background: rgba(40,45,60,0.7);
+  background: rgba(40, 45, 60, 0.7);
   color: #b0b8c1;
 }
-body.dark-mode .copy-btn:hover, body.dark-mode .copy-btn:focus {
+
+body.dark-mode .copy-btn:hover,
+body.dark-mode .copy-btn:focus {
   background: #23272f;
   color: #6ec6ff;
 }
+
 .blog-body pre {
   position: relative;
   display: flex;
   font-size: 0.98em;
 }
+
 .blog-body .code-lines {
   user-select: none;
   text-align: right;
@@ -48,15 +142,18 @@ body.dark-mode .copy-btn:hover, body.dark-mode .copy-btn:focus {
   opacity: 0.7;
   min-width: 2.2em;
 }
+
 body.dark-mode .blog-body .code-lines {
   border-right: 2px solid #23272f;
   color: #5e6b7a;
 }
+
 .blog-body pre code {
   padding-left: 1em;
   display: block;
   white-space: pre;
 }
+
 .blog-body pre {
   background: #f4f6fa;
   color: #263238;
@@ -66,22 +163,26 @@ body.dark-mode .blog-body .code-lines {
   overflow-x: auto;
   font-size: 0.98em;
   line-height: 1.7;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
+
 .blog-body code {
   font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'monospace';
   font-size: 0.98em;
   background: none;
   color: inherit;
 }
+
 body.dark-mode .blog-body pre {
   background: #232221;
   color: #e0e7ef;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.13);
 }
+
 body.dark-mode .blog-body code {
   color: #abe5ff;
 }
+
 .blog-body a {
   color: #2d89ef;
   text-decoration: none;
@@ -89,6 +190,7 @@ body.dark-mode .blog-body code {
   font-weight: 500;
   transition: color 0.18s;
 }
+
 .blog-body a::after {
   content: '';
   display: block;
@@ -100,16 +202,21 @@ body.dark-mode .blog-body code {
   background: var(--primary);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+  transition: transform 0.28s cubic-bezier(.4, 0, .2, 1);
   border-radius: 1px;
   opacity: 0.7;
 }
-.blog-body a:hover::after, .blog-body a:focus::after {
+
+.blog-body a:hover::after,
+.blog-body a:focus::after {
   transform: scaleX(1);
 }
-.blog-body a:hover, .blog-body a:focus {
+
+.blog-body a:hover,
+.blog-body a:focus {
   color: #1565c0;
 }
+
 .blog-meta time {
   color: #888;
   font-size: 0.98em;
@@ -146,9 +253,6 @@ body.dark-mode .blog-body h3::after {
 }
 
 footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
   width: 100vw;
   background: var(--card-bg-light);
   color: #888;
