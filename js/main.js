@@ -113,9 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scrollBtn.style.display = 'none';
       }
     });
-    // 初期状態
     scrollBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
-    // クリックでスムーズスクロール
     scrollBtn.addEventListener('click', function () {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
