@@ -536,7 +536,8 @@ body.dark-mode .card {
     width: 96px;
     height: 96px;
     border-radius: 0.6rem;
-    object-fit: cover;
+    object-fit: contain;
+    display: block;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
     transition: transform 0.25s cubic-bezier(.4, 2, .6, 1), box-shadow 0.25s, filter 0.25s;
     cursor: pointer;
