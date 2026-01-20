@@ -1,4 +1,8 @@
-/* --- Blog検索ボックス装飾 --- */
+/* blog-body内のリストのインデント調整 */
+.blog-body ul,
+.blog-body ol {
+  padding-left: 1.5em;
+}
 #blog-search {
   display: block;
   width: 100%;
