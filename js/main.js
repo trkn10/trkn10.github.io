@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
       tag.addEventListener('click', function (e) {
         e.preventDefault();
         if (searchInput) {
-          searchInput.value = tag.textContent.replace(/^#/, '');
+          searchInput.value = '#' + tag.textContent.replace(/^#/, '');
           filterArticles();
           searchInput.focus();
         }
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
       tag.style.cursor = 'pointer';
       tag.addEventListener('click', function (e) {
         e.preventDefault();
-        const keyword = encodeURIComponent(tag.textContent.replace(/^#/, ''));
+        const keyword = encodeURIComponent('#' + tag.textContent.replace(/^#/, ''));
         window.location.href = '/blog.html?tag=' + keyword;
       });
     });
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
     const tag = params.get('tag');
     if (tag) {
-      searchInput.value = tag;
+      searchInput.value = tag.startsWith('#') ? tag : ('#' + tag);
       filterArticles();
       searchInput.focus();
     }
