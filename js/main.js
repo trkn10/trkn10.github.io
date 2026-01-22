@@ -7,7 +7,6 @@ const blogArticles = [
 
 document.addEventListener('DOMContentLoaded', function () {
   const list = document.getElementById('blog-list');
-  if (!list) return;
   const searchInput = document.getElementById('blog-search');
   const cards = [];
 
@@ -19,53 +18,93 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  blogArticles.forEach((article) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <h1></h1>
-      <p></p>
-      <time class="blog-date text-gray"></time>
-      <div class="work-tags"></div>
-      <a href="${article.url}">続きを読む</a>
-    `;
-    list.appendChild(card);
-    cards.push(card);
-
-    fetch(article.url)
-      .then(res => res.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-
-        const time = div.querySelector('time');
-        if (time) {
-          const dateElem = card.querySelector('.blog-date');
-          if (dateElem) {
-            dateElem.textContent = time.textContent;
-            dateElem.setAttribute('datetime', time.getAttribute('datetime'));
-          }
+  function enableTagSearch(container) {
+    if (!container) return;
+    container.querySelectorAll('.work-tag').forEach(tag => {
+      tag.style.cursor = 'pointer';
+      tag.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (searchInput) {
+          searchInput.value = tag.textContent.replace(/^#/, '');
+          filterArticles();
+          searchInput.focus();
         }
-
-        const h1 = div.querySelector('h1');
-        if (h1) card.querySelector('h1').textContent = h1.textContent;
-
-        const firstP = div.querySelector('.blog-body p');
-        if (firstP) card.querySelector('p').textContent = firstP.textContent.split('\n')[0];
-
-        const tags = div.querySelector('.blog-tags');
-        if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;
-
-        const tagText = tags ? tags.textContent : '';
-        const titleText = h1 ? h1.textContent : '';
-        const bodyText = firstP ? firstP.textContent.split('\n')[0] : '';
-        card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
-        filterArticles();
       });
-  });
+    });
+  }
+
+  if (list) {
+    blogArticles.forEach((article) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h1></h1>
+        <p></p>
+        <time class="blog-date text-gray"></time>
+        <div class="work-tags"></div>
+        <a href="${article.url}">続きを読む</a>
+      `;
+      list.appendChild(card);
+      cards.push(card);
+
+      fetch(article.url)
+        .then(res => res.text())
+        .then(html => {
+          const div = document.createElement('div');
+          div.innerHTML = html;
+
+          const time = div.querySelector('time');
+          if (time) {
+            const dateElem = card.querySelector('.blog-date');
+            if (dateElem) {
+              dateElem.textContent = time.textContent;
+              dateElem.setAttribute('datetime', time.getAttribute('datetime'));
+            }
+          }
+
+          const h1 = div.querySelector('h1');
+          if (h1) card.querySelector('h1').textContent = h1.textContent;
+
+          const firstP = div.querySelector('.blog-body p');
+          if (firstP) card.querySelector('p').textContent = firstP.textContent.split('\n')[0];
+
+          const tags = div.querySelector('.blog-tags');
+          if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;
+
+          const tagText = tags ? tags.textContent : '';
+          const titleText = h1 ? h1.textContent : '';
+          const bodyText = firstP ? firstP.textContent.split('\n')[0] : '';
+          card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
+          filterArticles();
+
+          enableTagSearch(card.querySelector('.work-tags'));
+        });
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener('input', filterArticles);
+  }
+
+  if (document.querySelector('.blog-body')) {
+    document.querySelectorAll('.work-tag').forEach(tag => {
+      tag.style.cursor = 'pointer';
+      tag.addEventListener('click', function (e) {
+        e.preventDefault();
+        const keyword = encodeURIComponent(tag.textContent.replace(/^#/, ''));
+        window.location.href = '/blog.html?tag=' + keyword;
+      });
+    });
+  }
+
+  if (searchInput && window.location.search.includes('tag=')) {
+    const params = new URLSearchParams(window.location.search);
+    const tag = params.get('tag');
+    if (tag) {
+      searchInput.value = tag;
+      filterArticles();
+      searchInput.focus();
+    }
   }
 });
 
@@ -130,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
         link.href = href;
         document.head.appendChild(link);
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   document.querySelectorAll('.blog-body pre > code').forEach(function (code) {
