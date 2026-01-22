@@ -33,11 +33,29 @@
       <section class="blog-body">
         <p>ゲーム制作で便利なコマンドについて紹介します。</p>
         <h2>人数をカウントしてスコアボードに入れる</h2>
-        <p>▼リピート：遅延0</p>
+        <p>▼リピート：遅延0 <span class="text-gray">該当するプレイヤーがいなくなったら0が代入される</span></p>
         <pre><code>scoreboard players set red Counter 0</code></pre>
-        <p>▼チェーン：遅延0</p>
+        <p>▼チェーン：遅延0 <span class="text-gray">該当するプレイヤー一人一人が1を足すことでカウントできる</span></p>
         <pre><code>execute as @a[tag=red] at @s run scoreboard players add red Counter 1</code></pre>
         <p>これで、赤チームに所属しているプレイヤーの人数を「Counter」というスコアボードに「red」という名前で入れることができます。</p>
+        <h2>ゲーム中に途中退出したプレイヤーをリセット処理する</h2>
+        <p>▼リピート：遅延0 <span class="text-gray">全員0を設定し、ワールド参加時にリセットされるようにする</span></p>
+        <pre><code>scoreboard players add @a Reset 0</code></pre>
+        <p>▼チェーン：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
+        <pre><code>clear @a[scores={Reset=0}]</code></pre>
+        <p>▼チェーン：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
+        <pre><code>clearspawnpoint @a[scores={Reset=0}]</code></pre>
+        <p>▼チェーン：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
+        <pre><code>tag @a[scores={Reset=0}] remove red</code></pre>
+        <p>▼チェーン：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
+        <pre><code>tag @a[scores={Reset=0}] remove blue</code></pre>
+        <p>▼チェーン：遅延0 <span class="text-gray">リセット処理が完了したプレイヤーに1を足しておく</span></p>
+        <pre><code>scoreboard players add @a[scores={Reset=0}] Reset 1</code></pre>
+        <p>これでゲーム進行中に途中退出したプレイヤーにリセット処理を施すことができます。</p>
+        <p>ワールド参加時は必ずロビーでスポーンするといったことがこのコマンドで実装できます。</p>
+        <p>任意のタイミングでリセット処理を行いたい場合は、以下のようにします。</p>
+        <p>▼インパルス：遅延0 <span class="text-gray">全プレイヤーに0を設定し、リセット処理を誘発</span></p>
+        <pre><code>scoreboard players reset * Reset</code></pre>
       </section>
     </article>
   </main>

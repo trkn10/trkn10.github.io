@@ -96,6 +96,14 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.blog-body pre > code').forEach(function (code) {
     const pre = code.parentElement;
 
+    let wrapper = pre.parentElement;
+    if (!wrapper || !wrapper.classList || !wrapper.classList.contains('code-wrapper')) {
+      wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper';
+      pre.parentElement.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+    }
+
     if (!pre.querySelector('.code-lines')) {
       const lines = code.textContent.replace(/\n+$/, '').split('\n');
       const lineCount = lines.length;
@@ -106,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
       pre.insertBefore(span, code);
     }
 
-    if (!pre.querySelector('.copy-btn')) {
+    if (!wrapper.querySelector('.copy-btn')) {
       const btn = document.createElement('button');
       btn.className = 'copy-btn';
       btn.type = 'button';
@@ -118,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
           setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
         });
       });
-      pre.appendChild(btn);
+      wrapper.appendChild(btn);
     }
   });
 

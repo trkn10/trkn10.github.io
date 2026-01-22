@@ -170,11 +170,12 @@ footer {
   flex-shrink: 0;
 }
 
-.blog-body pre {
+.code-wrapper {
   position: relative;
+  display: block;
 }
 
-.copy-btn {
+.code-wrapper .copy-btn {
   position: absolute;
   top: 0.32em;
   right: 0.32em;
@@ -198,19 +199,18 @@ footer {
   color: var(--primary);
 }
 
-body.dark-mode .copy-btn {
+body.dark-mode .code-wrapper .copy-btn {
   background: rgba(40, 45, 60, 0.7);
   color: #b0b8c1;
 }
 
-body.dark-mode .copy-btn:hover,
-body.dark-mode .copy-btn:focus {
+body.dark-mode .code-wrapper .copy-btn:hover,
+body.dark-mode .code-wrapper .copy-btn:focus {
   background: #23272f;
   color: #6ec6ff;
 }
 
 .blog-body pre {
-  position: relative;
   display: flex;
   font-size: 0.98em;
 }
