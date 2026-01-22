@@ -212,6 +212,7 @@ body.dark-mode .code-wrapper .copy-btn:focus {
 
 .blog-body pre {
   display: flex;
+  align-items: flex-start;
   font-size: 0.98em;
 }
 
@@ -220,7 +221,7 @@ body.dark-mode .code-wrapper .copy-btn:focus {
   text-align: right;
   color: #b0b8c1;
   background: none;
-  padding: 0.1em 0.9em 0.1em 0.2em;
+  padding: 1em 0.9em 1em 0.2em;
   font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'monospace';
   font-size: 0.97em;
   line-height: 1.7;

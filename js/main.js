@@ -73,6 +73,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const modeBtn = document.getElementById('toggle-mode');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const saved = localStorage.getItem('color-mode');
+
+  function updateHljsTheme(isDark) {
+    try {
+      const lightHref = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css';
+      const darkHref = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css';
+      let link = document.getElementById('hljs-theme');
+      const href = isDark ? darkHref : lightHref;
+      if (link) {
+        if (link.href !== href) link.href = href;
+      } else {
+        link = document.createElement('link');
+        link.id = 'hljs-theme';
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+    } catch (e) {
+    }
+  }
   const setIcon = (isDark) => {
     modeBtn.innerHTML = isDark
       ? '<img src="/image/icon/light.png" alt="ライトモード" width="24" height="24">'
@@ -87,12 +106,33 @@ document.addEventListener('DOMContentLoaded', function () {
       const isDark = document.body.classList.contains('dark-mode');
       localStorage.setItem('color-mode', isDark ? 'dark' : 'light');
       setIcon(isDark);
+      updateHljsTheme(isDark);
     });
     setIcon(document.body.classList.contains('dark-mode'));
+    updateHljsTheme(document.body.classList.contains('dark-mode'));
   }
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
+  if (window.hljs && typeof window.hljs === 'object') {
+    try {
+      const isDark = document.body.classList.contains('dark-mode');
+      const lightHref = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css';
+      const darkHref = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css';
+      let link = document.getElementById('hljs-theme');
+      const href = isDark ? darkHref : lightHref;
+      if (link) {
+        if (link.href !== href) link.href = href;
+      } else {
+        link = document.createElement('link');
+        link.id = 'hljs-theme';
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+    } catch (e) {}
+  }
+
   document.querySelectorAll('.blog-body pre > code').forEach(function (code) {
     const pre = code.parentElement;
 
@@ -127,6 +167,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });
       wrapper.appendChild(btn);
+    }
+
+    try {
+      if (window.hljs && typeof window.hljs.highlightElement === 'function') {
+        window.hljs.highlightElement(code);
+      }
+    } catch (e) {
     }
   });
 
