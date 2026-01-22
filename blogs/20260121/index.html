@@ -56,7 +56,23 @@
         <p>任意のタイミングでリセット処理を行いたい場合は、以下のようにします。</p>
         <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">全プレイヤーに0を設定し、リセット処理を誘発</span></p>
         <pre><code>scoreboard players reset * Reset</code></pre>
+        <h2>タイマー（tick単位）</h2>
+        <p>30分をカウントするタイマーを紹介します。</p>
+        <p>1秒=20tick</p>
+        <p>1分=1200tick</p>
+        <p>30分=36000tick</p>
+        <p>なので以下でカウントするtick数、36000を設定します。</p>
+        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">カウントするtick数を設定</span></p>
+        <pre><code>scoreboard players add time Timer 36000</code></pre>
+        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">分の計算用の数値を設定</span></p>
+        <pre><code>scoreboard players add dmin Timer 1200</code></pre>
+        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">秒の計算用の数値を設定</span></p>
+        <pre><code>scoreboard players add dsec Timer 60</code></pre>
+        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">tickから秒の計算用の数値を設定</span></p>
+        <pre><code>scoreboard players add dtick Timer 20</code></pre>
       </section>
+      <p>必要な数値を設定したら、次にタイマーを動かすための繰り返し実行するコマンドを設定します。</p>
+      
     </article>
   </main>
   <button id="scrollTopBtn" title="ページの先頭へ" aria-label="ページの先頭へ">↑</button>
