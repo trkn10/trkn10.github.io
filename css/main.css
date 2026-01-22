@@ -1,3 +1,10 @@
+html {
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  display: none;
+}
 .blog-body ul,
 .blog-body ol {
   padding-left: 1.5em;
