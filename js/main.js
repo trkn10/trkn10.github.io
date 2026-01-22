@@ -1,8 +1,8 @@
 // ブログ記事リスト（ここに記事を追加するだけでOK）
 const blogArticles = [
-  { url: '/blogs/20260111/index.html' },
-  { url: '/blogs/20260121/index.html' }
-  // 例: { url: '/blogs/20260112/index.html' }, ...
+  // ここに追加
+  { url: '/blogs/20260121/index.html' },
+  { url: '/blogs/20260111/index.html' }
 ];
 
 document.addEventListener('DOMContentLoaded', function () {
