@@ -70,9 +70,26 @@
         <pre><code>scoreboard players add dsec Timer 60</code></pre>
         <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">tickから秒の計算用の数値を設定</span></p>
         <pre><code>scoreboard players add dtick Timer 20</code></pre>
+        <p>必要な数値を設定したら、次にタイマーを動かすための繰り返し実行するコマンドを設定します。</p>
+        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray"></span></p>
+        <pre><code>scoreboard players operation min Timer = time Timer</code></pre>
+        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray"></span></p>
+        <pre><code>scoreboard players operation sec Timer = time Timer</code></pre>
+        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">36000÷1200=30分</span></p>
+        <pre><code>scoreboard players operation min Timer /= dmin Timer</code></pre>
+        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">36000÷20=1800秒</span></p>
+        <pre><code>scoreboard players operation sec Timer /= dtick Timer</code></pre>
+        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">1799÷60=29...59秒(0~59)</span></p>
+        <pre><code>scoreboard players operation sec Timer %= dsec Timer</code></pre>
+        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">titlerawで制限時間を表示</span></p>
+        <pre><code>titleraw @a actionbar {"rawtext":[{"text":"制限時間【"},{"score":{"name":"min","objective":"Timer"}},{"text":"分"},{"score":{"name":"sec","objective":"Timer"}},{"text":"秒】"}]}</code></pre>
+        <p>タイマー機能はこれで完成。最後にtimeを遅延0で引いていけば動きます。</p>
+        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray"></span></p>
+        <pre><code>scoreboard players remove time Timer 1</code></pre>
+        <p>以下に実用例を紹介します。</p>
+        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray">tick単位で判定しているのでリピートで実行しても1回だけ実行される</span></p>
+        <pre><code>execute if score time Timer matches 0 run say 制限時間が終了しました</code></pre>
       </section>
-      <p>必要な数値を設定したら、次にタイマーを動かすための繰り返し実行するコマンドを設定します。</p>
-      
     </article>
   </main>
   <button id="scrollTopBtn" title="ページの先頭へ" aria-label="ページの先頭へ">↑</button>
