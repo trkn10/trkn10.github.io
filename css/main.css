@@ -398,6 +398,9 @@ body.dark-mode .work-tag:hover {
   background: #2d89ef;
   color: #fff;
 }
+/* TEMP: Force show scrollbars — commented out
+   The temporary block used to force scrollbar visibility for testing
+   has been removed (kept here as a note). Re-enable if needed. */
 
 .sns-icons a {
   position: static !important;
