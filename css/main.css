@@ -13,17 +13,7 @@
   padding: 0.3em 0.9em;
   color: inherit;
   background: none;
-  box-sizing: border-box;
-}
 
-body.dark-mode .blog-body h3 {
-  border-color: #444;
-  border-left-color: #6ec6ff;
-}
-
-
-.blog-body h4 {
-  font-size: 1.08em;
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.3em;
@@ -89,7 +79,6 @@ body.dark-mode .blog-body h6 {
   border-radius: 2em;
   background: #f8fbff url('data:image/svg+xml;utf8,<svg fill="%232d89ef" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99c.41.41 1.09.41 1.5 0s.41-1.09 0-1.5l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 0.8em center/1.3em 1.3em;
   background: #eaf4ff;
-  /* Light gray for light mode */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: border 0.18s, box-shadow 0.18s;
 }
@@ -320,6 +309,7 @@ body.dark-mode .blog-body .code-lines {
   padding-left: 1em;
   display: block;
   white-space: pre;
+  background: none !important;
 }
 
 .blog-body pre {
@@ -334,10 +324,31 @@ body.dark-mode .blog-body .code-lines {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
+pre {
+  scrollbar-width: thin;
+  scrollbar-color: #bcdcff #f4f6fa;
+}
+
+pre::-webkit-scrollbar {
+  height: 8px;
+  background: #f4f6fa;
+  border-radius: 6px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #bcdcff;
+  border-radius: 6px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #90caf9;
+}
+
+
 .blog-body code {
   font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'monospace';
   font-size: 0.98em;
-  background: none;
+  background: none !important;
   color: inherit;
 }
 
@@ -345,6 +356,26 @@ body.dark-mode .blog-body pre {
   background: #232221;
   color: #e0e7ef;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.13);
+}
+
+body.dark-mode pre {
+  scrollbar-width: thin;
+  scrollbar-color: #3a5c8c #232221;
+}
+
+body.dark-mode pre::-webkit-scrollbar {
+  height: 8px;
+  background: #232221;
+  border-radius: 6px;
+}
+
+body.dark-mode pre::-webkit-scrollbar-thumb {
+  background: #3a5c8c;
+  border-radius: 6px;
+}
+
+body.dark-mode pre::-webkit-scrollbar-thumb:hover {
+  background: #6ec6ff;
 }
 
 body.dark-mode .blog-body code {
@@ -477,10 +508,6 @@ body.dark-mode .work-tag:hover {
   background: #2d89ef;
   color: #fff;
 }
-
-/* TEMP: Force show scrollbars — commented out
-   The temporary block used to force scrollbar visibility for testing
-   has been removed (kept here as a note). Re-enable if needed. */
 
 .sns-icons a {
   position: static !important;
