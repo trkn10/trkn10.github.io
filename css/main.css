@@ -1,3 +1,7 @@
+.card h1 {
+  margin-bottom: 0.01em;
+}
+
 .blog-body h3 {
   font-size: 1.15em;
   font-weight: 700;
@@ -90,8 +94,6 @@ body.dark-mode .blog-body h6 {
   transition: border 0.18s, box-shadow 0.18s;
 }
 
-background: #294a6d !important;
-/* Light blue for dark mode, force override */
 @media (max-width: 600px) {
   #blog-search {
     max-width: 100%;
