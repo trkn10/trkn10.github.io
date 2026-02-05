@@ -53,6 +53,38 @@ document.addEventListener('DOMContentLoaded', function () {
           const div = document.createElement('div');
           div.innerHTML = html;
 
+          // タイトル
+          const h1 = div.querySelector('h1');
+          if (h1) card.querySelector('h1').textContent = h1.textContent;
+          const titleText = h1 ? h1.textContent : '';
+
+          // タグ
+          const tags = div.querySelector('.blog-tags');
+          if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;
+          const tagText = tags ? tags.textContent : '';
+
+          // 本文1行目
+          let firstLine = '';
+          let bodyText = '';
+          const easyMdScript = div.querySelector('#easy-md');
+          if (easyMdScript && window.easyMdParse) {
+            const dummy = document.createElement('div');
+            dummy.innerHTML = window.easyMdParse(easyMdScript.textContent || easyMdScript.innerText);
+            const p = dummy.querySelector('p');
+            if (p) {
+              firstLine = p.textContent.split('\n')[0];
+              bodyText = firstLine;
+            }
+          } else {
+            const firstP = div.querySelector('.blog-body p');
+            if (firstP) {
+              firstLine = firstP.textContent.split('\n')[0];
+              bodyText = firstLine;
+            }
+          }
+          card.querySelector('p').textContent = firstLine;
+
+          // 日付
           const time = div.querySelector('time');
           if (time) {
             const dateElem = card.querySelector('.blog-date');
@@ -62,37 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           }
 
-          const h1 = div.querySelector('h1');
-
-          if (h1) card.querySelector('h1').textContent = h1.textContent;
-
-
-          let firstLine = '';
-          const easyMdScript = div.querySelector('#easy-md');
-          if (easyMdScript) {
-            const dummy = document.createElement('div');
-            if (window.easyMdParse) {
-              dummy.innerHTML = window.easyMdParse(easyMdScript.textContent || easyMdScript.innerText);
-              const p = dummy.querySelector('p');
-              if (p) firstLine = p.textContent.split('\n')[0];
-            } else {
-              firstLine = (easyMdScript.textContent || easyMdScript.innerText).split('\n').find(l => l.trim()).trim();
-            }
-          } else {
-            const firstP = div.querySelector('.blog-body p');
-            if (firstP) firstLine = firstP.textContent.split('\n')[0];
-          }
-          card.querySelector('p').textContent = firstLine;
-
-          const tags = div.querySelector('.blog-tags');
-          if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;
-
-          const tagText = tags ? tags.textContent : '';
-          const titleText = h1 ? h1.textContent : '';
-          const bodyText = firstP ? firstP.textContent.split('\n')[0] : '';
+          // 検索対象テキスト（タイトル・タグ・本文1行目）
           card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
           filterArticles();
-
           enableTagSearch(card.querySelector('.work-tags'));
         });
     });
