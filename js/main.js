@@ -64,40 +64,52 @@ document.addEventListener('DOMContentLoaded', function () {
           const tagText = tags ? tags.textContent : '';
 
           // 本文1行目
-          let firstLine = '';
-          let bodyText = '';
-          const easyMdScript = div.querySelector('#easy-md');
-          if (easyMdScript && window.easyMdParse) {
-            const dummy = document.createElement('div');
-            dummy.innerHTML = window.easyMdParse(easyMdScript.textContent || easyMdScript.innerText);
-            const p = dummy.querySelector('p');
-            if (p) {
-              firstLine = p.textContent.split('\n')[0];
-              bodyText = firstLine;
+          function setPreview() {
+            let firstLine = '';
+            let bodyText = '';
+            const easyMdScript = div.querySelector('#easy-md');
+            if (easyMdScript) {
+              if (window.easyMdParse) {
+                const dummy = document.createElement('div');
+                dummy.innerHTML = window.easyMdParse(easyMdScript.textContent || easyMdScript.innerText);
+                const pList = dummy.querySelectorAll('p');
+                console.log('easy-md preview <p> list:', pList);
+                for (const p of pList) {
+                  const txt = p.textContent.trim();
+                  console.log('easy-md preview candidate:', txt);
+                  if (txt) {
+                    firstLine = txt.split('\n')[0];
+                    bodyText = firstLine;
+                    break;
+                  }
+                }
+              } else {
+                setTimeout(setPreview, 50);
+                return;
+              }
+            } else {
+              const firstP = div.querySelector('.blog-body p');
+              if (firstP) {
+                firstLine = firstP.textContent.split('\n')[0];
+                bodyText = firstLine;
+              }
             }
-          } else {
-            const firstP = div.querySelector('.blog-body p');
-            if (firstP) {
-              firstLine = firstP.textContent.split('\n')[0];
-              bodyText = firstLine;
+            card.querySelector('p').textContent = firstLine;
+            // 日付
+            const time = div.querySelector('time');
+            if (time) {
+              const dateElem = card.querySelector('.blog-date');
+              if (dateElem) {
+                dateElem.textContent = time.textContent;
+                dateElem.setAttribute('datetime', time.getAttribute('datetime'));
+              }
             }
+            // 検索対象テキスト
+            card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
+            filterArticles();
+            enableTagSearch(card.querySelector('.work-tags'));
           }
-          card.querySelector('p').textContent = firstLine;
-
-          // 日付
-          const time = div.querySelector('time');
-          if (time) {
-            const dateElem = card.querySelector('.blog-date');
-            if (dateElem) {
-              dateElem.textContent = time.textContent;
-              dateElem.setAttribute('datetime', time.getAttribute('datetime'));
-            }
-          }
-
-          // 検索対象テキスト（タイトル・タグ・本文1行目）
-          card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
-          filterArticles();
-          enableTagSearch(card.querySelector('.work-tags'));
+          setPreview();
         });
     });
   }
