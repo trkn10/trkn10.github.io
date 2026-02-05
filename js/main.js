@@ -63,10 +63,26 @@ document.addEventListener('DOMContentLoaded', function () {
           }
 
           const h1 = div.querySelector('h1');
+
           if (h1) card.querySelector('h1').textContent = h1.textContent;
 
-          const firstP = div.querySelector('.blog-body p');
-          if (firstP) card.querySelector('p').textContent = firstP.textContent.split('\n')[0];
+
+          let firstLine = '';
+          const easyMdScript = div.querySelector('#easy-md');
+          if (easyMdScript) {
+            const dummy = document.createElement('div');
+            if (window.easyMdParse) {
+              dummy.innerHTML = window.easyMdParse(easyMdScript.textContent || easyMdScript.innerText);
+              const p = dummy.querySelector('p');
+              if (p) firstLine = p.textContent.split('\n')[0];
+            } else {
+              firstLine = (easyMdScript.textContent || easyMdScript.innerText).split('\n').find(l => l.trim()).trim();
+            }
+          } else {
+            const firstP = div.querySelector('.blog-body p');
+            if (firstP) firstLine = firstP.textContent.split('\n')[0];
+          }
+          card.querySelector('p').textContent = firstLine;
 
           const tags = div.querySelector('.blog-tags');
           if (tags) card.querySelector('.work-tags').innerHTML = tags.innerHTML;

@@ -31,24 +31,38 @@
         </span>
       </div>
       <section class="blog-body">
-        <p>記事の説明文</p>
-        <img src="/image/profile.png" alt="プロフィール画像" class="blog-img">
-        <h2>見出しテスト</h2>
-        <a href="https://example.com">リンクテスト</a>
-        <p>記事本文</p>
-        <h3>見出しテスト</h3>
-        <span class="text-red">赤色のテキスト</span>
-        <span class="text-blue">青色のテキスト</span>
-        <span class="text-gray">グレーのテキスト</span>
-        <pre><code>function hello() {
-  console.log("Hello, world!");
-}</code></pre>
+        <script type="text/plain" id="easy-md">
+記事の説明文
 
+# h1
+## h2
+### h3
+#### h4
+##### h5
+###### h6
+
+- 箇条書き1
+- 箇条書き2
+
+{.text-red}赤色テキスト
+{.text-blue}青色テキスト
+
+![サンプル画像](/image/profile.png)
+
+[サンプルリンク](https://trkn10.github.io/)
+
+```
+console.log('サンプルコード');
+```
+        </script>
+        <script src="/js/easy-md.js"></script>
+        <div id="easy-md-html"></div>
       </section>
     </article>
   </main>
   <button id="scrollTopBtn" title="ページの先頭へ" aria-label="ページの先頭へ">↑</button>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <script src="/js/easy-md.js"></script>
   <script src="/js/main.js"></script>
   <footer>
     &copy; 2026 trkn Portfolio. All rights reserved.

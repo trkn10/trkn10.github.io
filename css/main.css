@@ -1,3 +1,71 @@
+.blog-body h3 {
+  font-size: 1.15em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  border: 1.5px solid #bbb;
+  border-left: 5px solid #2d89ef;
+  border-radius: 0.3em;
+  padding: 0.3em 0.9em;
+  color: inherit;
+  background: none;
+  box-sizing: border-box;
+}
+
+body.dark-mode .blog-body h3 {
+  border-color: #444;
+  border-left-color: #6ec6ff;
+}
+
+
+.blog-body h4 {
+  font-size: 1.08em;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.3em;
+  border-bottom: 1.5px solid #bbb;
+  padding: 0.18em 0.2em 0.18em 1.2em;
+  color: inherit;
+  background: none;
+  display: block;
+}
+
+body.dark-mode .blog-body h4 {
+  border-bottom: 1.5px solid #444;
+}
+
+.blog-body h5 {
+  font-size: 1em;
+  font-weight: 500;
+  margin-top: 1.2em;
+  margin-bottom: 0.2em;
+  color: #444;
+  border-left: 3px dotted #2d89ef55;
+  padding-left: 0.5em;
+}
+
+body.dark-mode .blog-body h5 {
+  color: #aaa;
+  border-left: 3px dotted #6ec6ff55;
+}
+
+.blog-body h6 {
+  font-size: 0.97em;
+  font-weight: 400;
+  margin-top: 1em;
+  margin-bottom: 0.1em;
+  color: #888;
+  letter-spacing: 0.04em;
+  background: #eaf4ff;
+  border-radius: 0.3em;
+  padding: 0.18em 0.7em;
+  display: inline-block;
+}
+
+body.dark-mode .blog-body h6 {
+  color: #eee;
+  background: #3a5c8c !important;
+}
 
 .blog-body ul,
 .blog-body ol {
@@ -16,11 +84,14 @@
   border: 1.5px solid #d0d7e2;
   border-radius: 2em;
   background: #f8fbff url('data:image/svg+xml;utf8,<svg fill="%232d89ef" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99c.41.41 1.09.41 1.5 0s.41-1.09 0-1.5l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 0.8em center/1.3em 1.3em;
-  color: #223;
+  background: #eaf4ff;
+  /* Light gray for light mode */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: border 0.18s, box-shadow 0.18s;
 }
 
+background: #294a6d !important;
+/* Light blue for dark mode, force override */
 @media (max-width: 600px) {
   #blog-search {
     max-width: 100%;
@@ -329,8 +400,7 @@ body.dark-mode .blog-meta time {
   margin-bottom: 0.5em;
 }
 
-.blog-body h2::after,
-.blog-body h3::after {
+.blog-body h2::after {
   content: '';
   display: block;
   margin-top: 0.32em;
@@ -341,8 +411,7 @@ body.dark-mode .blog-meta time {
   border-radius: 1px;
 }
 
-body.dark-mode .blog-body h2::after,
-body.dark-mode .blog-body h3::after {
+body.dark-mode .blog-body h2::after {
   background: var(--primary);
   opacity: 0.28;
 }
@@ -406,6 +475,7 @@ body.dark-mode .work-tag:hover {
   background: #2d89ef;
   color: #fff;
 }
+
 /* TEMP: Force show scrollbars — commented out
    The temporary block used to force scrollbar visibility for testing
    has been removed (kept here as a note). Re-enable if needed. */

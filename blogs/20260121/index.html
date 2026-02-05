@@ -31,69 +31,115 @@
         </span>
       </div>
       <section class="blog-body">
-        <p>ゲーム制作で便利なコマンドについて紹介します。</p>
-        <h2>人数をカウントしてスコアボードに入れる</h2>
-        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray">該当するプレイヤーがいなくなったら0が代入される</span></p>
-        <pre><code>scoreboard players set red Counter 0</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">該当するプレイヤー一人一人が1を足すことでカウントできる</span></p>
-        <pre><code>execute as @a[tag=red] at @s run scoreboard players add red Counter 1</code></pre>
-        <p>これで、赤チームに所属しているプレイヤーの人数を「Counter」というスコアボードに「red」という名前で入れることができます。</p>
-        <h2>ゲーム中に途中退出したプレイヤーをリセット処理する</h2>
-        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray">全員0を設定し、ワールド参加時にリセットされるようにする</span></p>
-        <pre><code>scoreboard players add @a Reset 0</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
-        <pre><code>clear @a[scores={Reset=0}]</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
-        <pre><code>clearspawnpoint @a[scores={Reset=0}]</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
-        <pre><code>tag @a[scores={Reset=0}] remove red</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">任意のリセット処理でOK</span></p>
-        <pre><code>tag @a[scores={Reset=0}] remove blue</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">リセット処理が完了したプレイヤーに1を足しておく</span></p>
-        <pre><code>scoreboard players add @a[scores={Reset=0}] Reset 1</code></pre>
-        <p>これでゲーム進行中に途中退出したプレイヤーにリセット処理を施すことができます。</p>
-        <p>ワールド参加時は必ずロビーでスポーンするといったことがこのコマンドで実装できます。</p>
-        <p>任意のタイミングでリセット処理を行いたい場合は、以下のようにします。</p>
-        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">全プレイヤーに0を設定し、リセット処理を誘発</span></p>
-        <pre><code>scoreboard players reset * Reset</code></pre>
-        <h2>タイマー（tick単位）</h2>
-        <p>30分をカウントするタイマーを紹介します。</p>
-        <p>1秒=20tick</p>
-        <p>1分=1200tick</p>
-        <p>30分=36000tick</p>
-        <p>なので以下でカウントするtick数、36000を設定します。</p>
-        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">カウントするtick数を設定</span></p>
-        <pre><code>scoreboard players add time Timer 36000</code></pre>
-        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">分の計算用の数値を設定</span></p>
-        <pre><code>scoreboard players add dmin Timer 1200</code></pre>
-        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">秒の計算用の数値を設定</span></p>
-        <pre><code>scoreboard players add dsec Timer 60</code></pre>
-        <p>▼<span class="text-orange">インパルス</span>：遅延0 <span class="text-gray">tickから秒の計算用の数値を設定</span></p>
-        <pre><code>scoreboard players add dtick Timer 20</code></pre>
-        <p>必要な数値を設定したら、次にタイマーを動かすための繰り返し実行するコマンドを設定します。</p>
-        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray"></span></p>
-        <pre><code>scoreboard players operation min Timer = time Timer</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray"></span></p>
-        <pre><code>scoreboard players operation sec Timer = time Timer</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">36000÷1200=30分</span></p>
-        <pre><code>scoreboard players operation min Timer /= dmin Timer</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">36000÷20=1800秒</span></p>
-        <pre><code>scoreboard players operation sec Timer /= dtick Timer</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">1799÷60=29...59秒(0~59)</span></p>
-        <pre><code>scoreboard players operation sec Timer %= dsec Timer</code></pre>
-        <p>▼<span class="text-cyan">チェーン</span>：遅延0 <span class="text-gray">titlerawで制限時間を表示</span></p>
-        <pre><code>titleraw @a actionbar {"rawtext":[{"text":"制限時間【"},{"score":{"name":"min","objective":"Timer"}},{"text":"分"},{"score":{"name":"sec","objective":"Timer"}},{"text":"秒】"}]}</code></pre>
-        <p>タイマー機能はこれで完成。最後にtimeを遅延0で引いていけば動きます。</p>
-        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray"></span></p>
-        <pre><code>scoreboard players remove time Timer 1</code></pre>
-        <p>以下に実用例を紹介します。</p>
-        <p>▼<span class="text-purple">リピート</span>：遅延0 <span class="text-gray">tick単位で判定しているのでリピートで実行しても1回だけ実行される</span></p>
-        <pre><code>execute if score time Timer matches 0 run say 制限時間が終了しました</code></pre>
+        <script type="text/plain" id="easy-md">
+ゲーム制作で便利なコマンドについて紹介します。
+## 人数をカウントしてスコアボードに入れる
+▼{.text-purple}リピート：遅延0 {.text-gray}該当するプレイヤーがいなくなったら0が代入される
+```
+scoreboard players set red Counter 0
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}該当するプレイヤー一人一人が1を足すことでカウントできる
+```
+execute as @a[tag=red] at @s run scoreboard players add red Counter 1
+```
+これで、赤チームに所属しているプレイヤーの人数を「Counter」というスコアボードに「red」という名前で入れることができます。
+## ゲーム中に途中退出したプレイヤーをリセット処理する
+▼{.text-purple}リピート：遅延0 {.text-gray}全員0を設定し、ワールド参加時にリセットされるようにする
+```
+scoreboard players add @a Reset 0
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}任意のリセット処理でOK
+```
+clear @a[scores={Reset=0}]
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}任意のリセット処理でOK
+```
+clearspawnpoint @a[scores={Reset=0}]
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}任意のリセット処理でOK
+```
+tag @a[scores={Reset=0}] remove red
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}任意のリセット処理でOK
+```
+tag @a[scores={Reset=0}] remove blue
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}リセット処理が完了したプレイヤーに1を足しておく
+```
+scoreboard players add @a[scores={Reset=0}] Reset 1
+```
+これでゲーム進行中に途中退出したプレイヤーにリセット処理を施すことができます。
+ワールド参加時は必ずロビーでスポーンするといったことがこのコマンドで実装できます。
+任意のタイミングでリセット処理を行いたい場合は、以下のようにします。
+▼{.text-orange}インパルス：遅延0 {.text-gray}全プレイヤーに0を設定し、リセット処理を誘発
+```
+scoreboard players reset * Reset
+```
+## タイマー（tick単位）
+30分をカウントするタイマーを紹介します。
+1秒=20tick
+1分=1200tick
+30分=36000tick
+なので以下でカウントするtick数、36000を設定します。
+▼{.text-orange}インパルス：遅延0 {.text-gray}カウントするtick数を設定
+```
+scoreboard players add time Timer 36000
+```
+▼{.text-orange}インパルス：遅延0 {.text-gray}分の計算用の数値を設定
+```
+scoreboard players add dmin Timer 1200
+```
+▼{.text-orange}インパルス：遅延0 {.text-gray}秒の計算用の数値を設定
+```
+scoreboard players add dsec Timer 60
+```
+▼{.text-orange}インパルス：遅延0 {.text-gray}tickから秒の計算用の数値を設定
+```
+scoreboard players add dtick Timer 20
+```
+必要な数値を設定したら、次にタイマーを動かすための繰り返し実行するコマンドを設定します。
+▼{.text-purple}リピート：遅延0
+```
+scoreboard players operation min Timer = time Timer
+```
+▼{.text-cyan}チェーン：遅延0
+```
+scoreboard players operation sec Timer = time Timer
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}36000÷1200=30分
+```
+scoreboard players operation min Timer /= dmin Timer
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}36000÷20=1800秒
+```
+scoreboard players operation sec Timer /= dtick Timer
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}1799÷60=29...59秒(0~59)
+```
+scoreboard players operation sec Timer %= dsec Timer
+```
+▼{.text-cyan}チェーン：遅延0 {.text-gray}titlerawで制限時間を表示
+```
+titleraw @a actionbar {"rawtext":[{"text":"制限時間【"},{"score":{"name":"min","objective":"Timer"}},{"text":"分"},{"score":{"name":"sec","objective":"Timer"}},{"text":"秒】"}]}
+```
+タイマー機能はこれで完成。最後にtimeを遅延0で引いていけば動きます。
+▼{.text-purple}リピート：遅延0
+```
+scoreboard players remove time Timer 1
+```
+以下に実用例を紹介します。
+▼{.text-purple}リピート：遅延0 {.text-gray}tick単位で判定しているのでリピートで実行しても1回だけ実行される
+```
+execute if score time Timer matches 0 run say 制限時間が終了しました
+```
+        </script>
+        <div id="easy-md-html"></div>
       </section>
     </article>
   </main>
   <button id="scrollTopBtn" title="ページの先頭へ" aria-label="ページの先頭へ">↑</button>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <script src="/js/easy-md.js"></script>
   <script src="/js/main.js"></script>
   <footer>
     &copy; 2026 trkn Portfolio. All rights reserved.
