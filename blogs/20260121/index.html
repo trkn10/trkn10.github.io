@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ゲーム制作で便利なコマンド | Blog | My Portfolio</title>
+  <title>ゲーム制作で便利なコマンド3選 | Blog | My Portfolio</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 
@@ -20,7 +20,7 @@
   </header>
   <main>
     <article class="blog-article">
-      <h1>ゲーム制作で便利なコマンド</h1>
+      <h1>ゲーム制作で便利なコマンド3選</h1>
       <div class="blog-meta">
         <time datetime="2026-01-21">2026年1月21日</time>
         <br>
@@ -32,8 +32,8 @@
       </div>
       <section class="blog-body">
         <script type="text/plain" id="easy-md">
-ゲーム制作で便利なコマンドについて紹介します。
-## 人数をカウントしてスコアボードに入れる
+ゲーム制作で便利なコマンド3選について紹介します。
+## １．人数をカウントしてスコアボードに入れる
 ▼{.text-purple}リピート：遅延0 {.text-gray}該当するプレイヤーがいなくなったら0が代入される
 ```
 scoreboard players set red Counter 0
@@ -43,7 +43,7 @@ scoreboard players set red Counter 0
 execute as @a[tag=red] at @s run scoreboard players add red Counter 1
 ```
 これで、赤チームに所属しているプレイヤーの人数を「Counter」というスコアボードに「red」という名前で入れることができます。
-## ゲーム中に途中退出したプレイヤーをリセット処理する
+## ２．ゲーム中に途中退出したプレイヤーをリセット処理する
 ▼{.text-purple}リピート：遅延0 {.text-gray}全員0を設定し、ワールド参加時にリセットされるようにする
 ```
 scoreboard players add @a Reset 0
@@ -75,7 +75,7 @@ scoreboard players add @a[scores={Reset=0}] Reset 1
 ```
 scoreboard players reset * Reset
 ```
-## タイマー（tick単位）
+## ３．タイマー（tick単位）
 30分をカウントするタイマーを紹介します。
 1秒=20tick
 1分=1200tick
@@ -132,6 +132,7 @@ scoreboard players remove time Timer 1
 ```
 execute if score time Timer matches 0 run say 制限時間が終了しました
 ```
+以上、ゲーム制作で便利なコマンド3選の紹介でした。
         </script>
         <div id="easy-md-html"></div>
       </section>
