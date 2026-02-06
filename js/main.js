@@ -12,14 +12,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function filterArticles() {
     const keyword = (searchInput?.value || '').trim().toLowerCase();
-    // 複数タグ対応: #タグ1 #タグ2 ... を抽出
     const tagMatches = keyword.match(/#[^\s#]+/g) || [];
     const otherKeyword = keyword.replace(/#[^\s#]+/g, '').trim();
     cards.forEach(card => {
       const text = card.dataset.searchText || '';
-      // タグ検索: 全てのタグが含まれている場合のみ表示
       const tagOk = tagMatches.every(tag => text.includes(tag));
-      // 通常キーワード検索: キーワードが含まれている場合
       const keywordOk = !otherKeyword || text.includes(otherKeyword);
       card.style.display = (!keyword || (tagOk && keywordOk)) ? '' : 'none';
     });

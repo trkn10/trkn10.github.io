@@ -1,16 +1,43 @@
 (function(){
   function easyMdParse(text) {
-    // コードブロック
+      let headings = [];
+      let headingCount = 0;
+
     text = text.replace(/```([\s\S]*?)```/g, function (_, code) {
       return '<pre><code>' + code.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])) + '</code></pre>';
     });
-    // 見出し（h1～h6対応）
-    text = text.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
-    text = text.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
-    text = text.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
-    text = text.replace(/^### (.*)$/gm, '<h3>$1</h3>');
-    text = text.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^###### (.*)$/gm, function(_, t) {
+      headingCount++;
+      const id = 'toc-h6-' + headingCount;
+      headings.push({level:6, text:t, id});
+      return `<h6 id="${id}">${t}</h6>`;
+    });
+    text = text.replace(/^##### (.*)$/gm, function(_, t) {
+      headingCount++;
+      const id = 'toc-h5-' + headingCount;
+      headings.push({level:5, text:t, id});
+      return `<h5 id="${id}">${t}</h5>`;
+    });
+    text = text.replace(/^#### (.*)$/gm, function(_, t) {
+      headingCount++;
+      const id = 'toc-h4-' + headingCount;
+      headings.push({level:4, text:t, id});
+      return `<h4 id="${id}">${t}</h4>`;
+    });
+    text = text.replace(/^### (.*)$/gm, function(_, t) {
+      headingCount++;
+      const id = 'toc-h3-' + headingCount;
+      headings.push({level:3, text:t, id});
+      return `<h3 id="${id}">${t}</h3>`;
+    });
+    text = text.replace(/^## (.*)$/gm, function(_, t) {
+      headingCount++;
+      const id = 'toc-h2-' + headingCount;
+      headings.push({level:2, text:t, id});
+      return `<h2 id="${id}">${t}</h2>`;
+    });
     text = text.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+
     // リスト
     text = text.replace(/^(\s*)- (.*)$/gm, '$1<li>$2</li>');
     text = text.replace(/(<li>.*<\/li>\n?)+/g, function (m) { return '<ul>' + m.replace(/\n/g, '') + '</ul>'; });
@@ -32,6 +59,18 @@
       if (line.trim() === '') return '';
       return '<p>' + line.trim() + '</p>';
     });
+
+    // 目次
+    if (text.includes('[TOC]') && headings.length) {
+      let tocHtml = '<div class="easy-md-toc"><b>目次</b><ol style="padding-left:1.5em">';
+      headings.forEach(h => {
+        if (h.level === 2) {
+          tocHtml += `<li class="toc-item toc-lv2"><a href="#${h.id}">${h.text}</a></li>`;
+        }
+      });
+      tocHtml += '</ol></div>';
+      text = text.replace('[TOC]', tocHtml);
+    }
     return text;
   }
   window.easyMdParse = easyMdParse;
@@ -42,5 +81,14 @@
     var text = src.textContent || src.innerText;
     out.innerHTML = easyMdParse(text);
     if (window.hljs) document.querySelectorAll('pre code').forEach(c => hljs.highlightElement(c));
+    document.querySelectorAll('.easy-md-toc a').forEach(a => {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.getElementById(a.getAttribute('href').replace('#',''));
+        if (target) {
+          target.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      });
+    });
   });
 })();

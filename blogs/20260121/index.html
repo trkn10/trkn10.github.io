@@ -33,7 +33,8 @@
       <section class="blog-body">
         <script type="text/plain" id="easy-md">
 ゲーム制作で便利なコマンド3選について紹介します。
-## １．人数をカウントしてスコアボードに入れる
+[TOC]
+## 人数をカウントしてスコアボードに入れる
 ▼{.text-purple}リピート：遅延0 {.text-gray}該当するプレイヤーがいなくなったら0が代入される
 ```
 scoreboard players set red Counter 0
@@ -43,7 +44,7 @@ scoreboard players set red Counter 0
 execute as @a[tag=red] at @s run scoreboard players add red Counter 1
 ```
 これで、赤チームに所属しているプレイヤーの人数を「Counter」というスコアボードに「red」という名前で入れることができます。
-## ２．ゲーム中に途中退出したプレイヤーをリセット処理する
+## ゲーム中に途中退出したプレイヤーをリセット処理する
 ▼{.text-purple}リピート：遅延0 {.text-gray}全員0を設定し、ワールド参加時にリセットされるようにする
 ```
 scoreboard players add @a Reset 0
@@ -75,7 +76,7 @@ scoreboard players add @a[scores={Reset=0}] Reset 1
 ```
 scoreboard players reset * Reset
 ```
-## ３．タイマー（tick単位）
+## タイマー（tick単位）
 30分をカウントするタイマーを紹介します。
 1秒=20tick
 1分=1200tick
