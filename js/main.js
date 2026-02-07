@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
       card.innerHTML = `
         <h1></h1>
         <p></p>
-        <time class="blog-date text-gray"></time>
         <div class="work-tags"></div>
+        <time class="blog-date text-gray"></time>
         <a href="${article.url}">続きを読む</a>
       `;
       list.appendChild(card);

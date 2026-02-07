@@ -1,3 +1,8 @@
+.blog-date,
+.blog-updated {
+  font-size: 0.85em;
+}
+
 .card h1 {
   margin-bottom: 0.01em;
 }
@@ -322,26 +327,28 @@ body.dark-mode .blog-body .code-lines {
   font-size: 0.98em;
   line-height: 1.7;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    /* --- 横スクロールバーのカスタム --- */
-  }
-
-  pre {
-    scrollbar-width: thin;
-    scrollbar-color: #bcdcff #f4f6fa;
-  }
-  pre::-webkit-scrollbar {
-    height: 8px;
-    background: #f4f6fa;
-    border-radius: 6px;
-  }
-  pre::-webkit-scrollbar-thumb {
-    background: #bcdcff;
-    border-radius: 6px;
-  }
-  pre::-webkit-scrollbar-thumb:hover {
-    background: #90caf9;
-  }
 }
+
+pre {
+  scrollbar-width: thin;
+  scrollbar-color: #bcdcff #f4f6fa;
+}
+
+pre::-webkit-scrollbar {
+  height: 8px;
+  background: #f4f6fa;
+  border-radius: 6px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #bcdcff;
+  border-radius: 6px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #90caf9;
+}
+
 
 .blog-body code {
   font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'monospace';
@@ -360,15 +367,18 @@ body.dark-mode pre {
   scrollbar-width: thin;
   scrollbar-color: #3a5c8c #232221;
 }
+
 body.dark-mode pre::-webkit-scrollbar {
   height: 8px;
   background: #232221;
   border-radius: 6px;
 }
+
 body.dark-mode pre::-webkit-scrollbar-thumb {
   background: #3a5c8c;
   border-radius: 6px;
 }
+
 body.dark-mode pre::-webkit-scrollbar-thumb:hover {
   background: #6ec6ff;
 }
