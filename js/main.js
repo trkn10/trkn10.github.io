@@ -6,6 +6,20 @@ const blogArticles = [
 ];
 
 document.addEventListener('DOMContentLoaded', function () {
+    const meta = document.querySelector('.blog-meta');
+    if (meta) {
+      const updated = meta.querySelector('.blog-updated');
+      const published = meta.querySelector('.blog-date');
+      if (updated && published) {
+        const dateText = `最終更新日:${updated.textContent} 投稿日:${published.textContent}`;
+        const span = document.createElement('span');
+        span.className = 'blog-date text-gray';
+        span.textContent = dateText;
+        meta.insertBefore(span, updated);
+        updated.remove();
+        published.remove();
+      }
+    }
   const list = document.getElementById('blog-list');
   const searchInput = document.getElementById('blog-search');
   const cards = [];
@@ -99,14 +113,19 @@ document.addEventListener('DOMContentLoaded', function () {
               }
             }
             card.querySelector('p').textContent = firstLine;
-            // 日付
-            const time = div.querySelector('time');
-            if (time) {
-              const dateElem = card.querySelector('.blog-date');
-              if (dateElem) {
-                dateElem.textContent = time.textContent;
-                dateElem.setAttribute('datetime', time.getAttribute('datetime'));
-              }
+            // 日付（投稿日・最終更新日）
+            const updated = div.querySelector('.blog-updated');
+            const published = div.querySelector('.blog-date');
+            let dateText = '';
+            if (updated && published) {
+              dateText = `最終更新日:${updated.textContent} 投稿日:${published.textContent}`;
+            } else if (published) {
+              dateText = `投稿日:${published.textContent}`;
+            }
+            const dateElem = card.querySelector('.blog-date');
+            if (dateElem) {
+              dateElem.textContent = dateText;
+              if (published) dateElem.setAttribute('datetime', published.getAttribute('datetime'));
             }
             // 検索対象テキスト
             card.dataset.searchText = `${titleText} ${tagText} ${bodyText}`.toLowerCase();
