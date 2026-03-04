@@ -25,6 +25,34 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   if (animationId) cancelAnimationFrame(animationId);
   const music = MUSIC_LIST.find(m => m.id === musicId);
   const diffLabel = DIFFICULTIES.find(d => d.id === difficulty)?.label || '';
+  // BGM再生
+  let bgmAudio = null;
+  let bgmPausedAt = 0;
+  const volume = localStorage.getItem('volume') !== null ? Number(localStorage.getItem('volume')) : 0.8;
+  if (music && music.file) {
+    bgmAudio = new Audio('music/' + music.file);
+    bgmAudio.loop = false;
+    bgmAudio.volume = volume;
+    bgmAudio.play();
+  }
+  function stopBgm() {
+    if (bgmAudio) {
+      bgmAudio.pause();
+      bgmAudio.currentTime = 0;
+    }
+  }
+  function pauseBgm() {
+    if (bgmAudio) {
+      bgmAudio.pause();
+      bgmPausedAt = bgmAudio.currentTime;
+    }
+  }
+  function resumeBgm() {
+    if (bgmAudio) {
+      bgmAudio.currentTime = bgmPausedAt;
+      bgmAudio.play();
+    }
+  }
   app.innerHTML = `
     <div style="position:relative; width:640px; margin:0 auto;">
       <button id="pauseBtn" style="position:absolute; left:0; top:0; z-index:10;">⏸</button>
@@ -33,7 +61,9 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
       <div id="scoreInfo" style="position:absolute; right:16px; top:16px; color:#fff; font-size:1.2em; background:rgba(0,0,0,0.5); padding:4px 16px; border-radius:8px; z-index:12;">Score: 0</div>
       <div id="progressBarContainer" style="position:absolute; right:16px; top:56px; width:120px; height:8px; z-index:12;"></div>
       <div id="pauseOverlay" style="display:none; position:absolute; left:0; top:0; width:640px; height:480px; background:rgba(0,0,0,0.7); z-index:20; align-items:center; justify-content:center; flex-direction:column;">
-        <div style="margin-top:120px;">
+        <div style="margin-top:40px; display:flex; flex-direction:column; align-items:center;">
+          <button id="resumeBtn" style="font-size:1.2em; margin-bottom:24px;">再開する</button>
+          <div id="countdown" style="font-size:2.5em; color:#fff; margin-bottom:16px;"></div>
           <button id="retryBtn" style="font-size:1.2em; margin:12px 0;">リトライ</button><br>
           <button id="interruptBtn" style="font-size:1.2em;">中断する</button>
         </div>
@@ -63,8 +93,8 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   ];
   let bulletIndex = 0;
 
-  // 曲の長さ仮設定（秒）
-  const musicDuration = 10;
+  // 曲の長さ（秒）
+  const musicDuration = music && music.duration ? music.duration : 10;
   let startTime = null;
   let elapsed = 0;
   let hp = 3;
@@ -93,13 +123,59 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     pauseState = true;
     pauseOverlay.style.display = 'flex';
     cancelAnimationFrame(animationId);
-    // 音楽・弾幕等の停止（後で詳細実装）
+    pauseBgm();
   };
   pauseOverlay.onclick = e => { e.stopPropagation(); };
+  // 再開ボタンでカウントダウン再開
+  const resumeBtn = pauseOverlay.querySelector('#resumeBtn');
+  const countdownDiv = pauseOverlay.querySelector('#countdown');
+  resumeBtn.onclick = () => {
+    // ボタン類を非表示
+    resumeBtn.style.display = 'none';
+    const retryBtn = pauseOverlay.querySelector('#retryBtn');
+    const interruptBtn = pauseOverlay.querySelector('#interruptBtn');
+    retryBtn.style.display = 'none';
+    interruptBtn.style.display = 'none';
+    countdownDiv.textContent = '';
+    countdownDiv.style.display = 'block';
+    countdownDiv.style.textAlign = 'center';
+    let count = 3;
+    countdownDiv.textContent = count;
+    // カウントダウン中は他ボタン無効
+    let countdownActive = true;
+    const disableAll = e => { if (countdownActive) e.stopPropagation(); };
+    pauseOverlay.addEventListener('click', disableAll, true);
+    retryBtn.addEventListener('click', disableAll, true);
+    interruptBtn.addEventListener('click', disableAll, true);
+    const countdown = setInterval(() => {
+      count--;
+      if (count > 0) {
+        countdownDiv.textContent = count;
+      } else {
+        clearInterval(countdown);
+        countdownDiv.textContent = '';
+        countdownDiv.style.display = 'none';
+        pauseState = false;
+        pauseOverlay.style.display = 'none';
+        resumeBgm();
+        animationId = requestAnimationFrame(loop);
+        // ボタン類を再表示
+        resumeBtn.style.display = '';
+        retryBtn.style.display = '';
+        interruptBtn.style.display = '';
+        countdownActive = false;
+        pauseOverlay.removeEventListener('click', disableAll, true);
+        retryBtn.removeEventListener('click', disableAll, true);
+        interruptBtn.removeEventListener('click', disableAll, true);
+      }
+    }, 700);
+  };
   pauseOverlay.querySelector('#retryBtn').onclick = () => {
-    startGame(app, { musicId, difficulty });
+    stopBgm();
+    startGame(app, { musicId, difficulty, mode });
   };
   pauseOverlay.querySelector('#interruptBtn').onclick = () => {
+    stopBgm();
     import('./main.js').then(mod => mod.navigate('select'));
   };
 
@@ -177,6 +253,7 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
         playHitSE();
         if (hp <= 0) {
           // ゲームオーバー
+          stopBgm();
           import('./main.js').then(mod => mod.navigate('result', { score, damage, musicId }));
           return;
         }
@@ -196,6 +273,7 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
 
     // 曲終了
     if (elapsed >= musicDuration) {
+      stopBgm();
       import('./main.js').then(mod => mod.navigate('result', { score, damage, musicId }));
       return;
     }
