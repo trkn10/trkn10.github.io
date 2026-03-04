@@ -1,3 +1,24 @@
+/* 安全性・注意事項案内セクション（ダークモード対応） */
+.safety-notice, section.safety-notice {
+  background: #f8f8f8;
+  color: #222;
+  border-radius: 8px;
+  padding: 1em 1.2em;
+  margin-bottom: 1.5em;
+  font-size: 1em;
+}
+body.dark-mode .safety-notice, body.dark-mode section.safety-notice {
+  background: #23272f;
+  color: #eaf6ff;
+  border: 1.5px solid #3a4a5a;
+}
+body.dark-mode .safety-notice b,
+body.dark-mode .safety-notice strong {
+  color: #fff;
+}
+body.dark-mode .safety-notice span[style*="color:#c00"] {
+  color: #ff6e6e !important;
+}
 .blog-date,
 .blog-updated {
   font-size: 0.85em;

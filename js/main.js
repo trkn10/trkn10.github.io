@@ -2,7 +2,6 @@
 const blogArticles = [
   // ここに追加
   { url: '/blogs/20260121/index.html' },
-  { url: '/blogs/20260111/index.html' }
 ];
 
 document.addEventListener('DOMContentLoaded', function () {
