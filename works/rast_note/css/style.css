@@ -61,8 +61,8 @@ body {
 
 #hpGaugeContainer {
   background: none !important;
-  box-shadow: 0 0 16px #ff2f6e88, 0 0 4px #fff2;
-  border-radius: 16px;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 #hpGaugeContainer svg {

@@ -7,6 +7,7 @@ export class Player {
     this.speed = 3;
     this.area = area;
     this.alive = true;
+    this.hitEffect = 0; // 被弾点滅フレーム数
   }
   move(dx, dy) {
     const nx = this.x + dx * this.speed;
@@ -19,8 +20,14 @@ export class Player {
     ctx.save();
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#4af';
+    // 被弾点滅中は赤色、それ以外は通常色
+    if (this.hitEffect > 0 && Math.floor(this.hitEffect / 2) % 2 === 0) {
+      ctx.fillStyle = '#f44';
+    } else {
+      ctx.fillStyle = '#4af';
+    }
     ctx.fill();
     ctx.restore();
+    if (this.hitEffect > 0) this.hitEffect--;
   }
 }

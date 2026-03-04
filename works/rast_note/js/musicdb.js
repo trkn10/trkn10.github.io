@@ -19,15 +19,18 @@ export const MUSIC_LIST = [
     },
     patterns: {
       prelude: [
-        { time: 0.5, config: { x: 100, y: 100, angle: Math.PI/4, speed: 2, type: 'normal', color: '#4af' } },
-        { time: 2.0, config: { x: 540, y: 100, angle: Math.PI*3/4, speed: 2, type: 'normal', color: '#4af' } }
+        { time: 0.5, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: '#0ff', origin: 'center' } },
+        { time: 1.0, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: '#f44', origin: 'left' } },
+        { time: 1.5, config: { x: 0, y: 0, angle: Math.PI, speed: 2, type: 'normal', color: '#4f4', origin: 'right' } },
+        { time: 2.0, config: { x: 0, y: 0, angle: Math.PI/2, speed: 2, type: 'normal', color: '#ff0', origin: 'top' } },
+        { time: 2.5, config: { x: 0, y: 0, angle: -Math.PI/2, speed: 2, type: 'normal', color: '#00f', origin: 'bottom' } },
       ],
       refrain: [
         { time: 0.5, config: { x: 100, y: 100, angle: Math.PI/4, speed: 2.5, type: 'normal', color: '#f44' } },
         { time: 1.0, config: { x: 320, y: 400, angle: -Math.PI/2, speed: 3, type: 'normal', color: '#ff0' } }
       ],
       finale: [
-        { time: 0.5, config: { x: 320, y: 80, angle: Math.PI/2, speed: 4, type: 'normal', color: '#f44' } },
+        { time: 0.5, config: { x: 320, y: 180, angle: Math.PI/2, speed: 4, type: 'normal', color: '#f44' } },
         { time: 1.0, config: { x: 320, y: 400, angle: -Math.PI/2, speed: 4, type: 'normal', color: '#ff0' } },
         { time: 2.0, config: { x: 100, y: 240, angle: 0, speed: 3, type: 'normal', color: '#4af' } }
       ]

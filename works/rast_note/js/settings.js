@@ -1,28 +1,34 @@
 import { navigate } from './main.js';
 
 export function showSettings(app) {
-  const seEnabled = localStorage.getItem('seEnabled') !== 'false';
-  const volume = localStorage.getItem('volume') !== null ? Number(localStorage.getItem('volume')) : 0.8;
+  const seVolume = localStorage.getItem('seVolume') !== null ? Number(localStorage.getItem('seVolume')) : 0.8;
+  const bgmVolume = localStorage.getItem('bgmVolume') !== null ? Number(localStorage.getItem('bgmVolume')) : 0.8;
   app.innerHTML = `
     <h2>設定</h2>
     <div style="margin-bottom:8px;">
-      <div style="font-size:1.1em; text-align:center; margin-bottom:2px;" id="volumeValue">${Math.round(volume * 100)}</div>
-      <input type="range" min="0" max="1" step="0.01" id="volumeSlider" value="${volume}">
+      <div style="font-size:1.1em; text-align:center; margin-bottom:2px;">BGM音量 <span id="bgmVolumeValue">${Math.round(bgmVolume * 100)}</span></div>
+      <input type="range" min="0" max="1" step="0.01" id="bgmVolumeSlider" value="${bgmVolume}">
     </div>
-    <label><input type="checkbox" id="seCheckbox" ${seEnabled ? 'checked' : ''}> SE（効果音）ON</label><br>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:1.1em; text-align:center; margin-bottom:2px;">SE音量 <span id="seVolumeValue">${Math.round(seVolume * 100)}</span></div>
+      <input type="range" min="0" max="1" step="0.01" id="seVolumeSlider" value="${seVolume}">
+    </div>
     <button id="backBtn">戻る</button>
-    <style>#seCheckbox { transform: scale(1.3); margin-right: 0.5em; }</style>
-    <style>#volumeSlider { width: 200px; }</style>
+    <style>#seVolumeSlider, #bgmVolumeSlider { width: 200px; }</style>
   `;
-  document.getElementById('backBtn').onclick = () => navigate('menu');
-  document.getElementById('seCheckbox').onchange = e => {
-    localStorage.setItem('seEnabled', e.target.checked);
-  };
-  const slider = document.getElementById('volumeSlider');
-  const valueLabel = document.getElementById('volumeValue');
-  slider.oninput = e => {
+  document.getElementById('backBtn').onclick = () => navigate('select');
+  const seSlider = document.getElementById('seVolumeSlider');
+  const seValueLabel = document.getElementById('seVolumeValue');
+  seSlider.oninput = e => {
     const v = Number(e.target.value);
-    valueLabel.textContent = Math.round(v * 100);
-    localStorage.setItem('volume', v);
+    seValueLabel.textContent = Math.round(v * 100);
+    localStorage.setItem('seVolume', v);
+  };
+  const bgmSlider = document.getElementById('bgmVolumeSlider');
+  const bgmValueLabel = document.getElementById('bgmVolumeValue');
+  bgmSlider.oninput = e => {
+    const v = Number(e.target.value);
+    bgmValueLabel.textContent = Math.round(v * 100);
+    localStorage.setItem('bgmVolume', v);
   };
 }

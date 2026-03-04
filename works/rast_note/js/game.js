@@ -19,8 +19,14 @@ if (localStorage.getItem('seEnabled') !== null) {
   seEnabled = localStorage.getItem('seEnabled') === 'true';
   seManager.setEnabled(seEnabled);
 }
+if (localStorage.getItem('seVolume') !== null) {
+  seManager.setVolume(Number(localStorage.getItem('seVolume')));
+}
 
 export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
+    // フルスコア演出用
+    let fullScoreShown = false;
+    let fullScoreTimer = 0;
   pauseState = false;
   if (animationId) cancelAnimationFrame(animationId);
   const music = MUSIC_LIST.find(m => m.id === musicId);
@@ -28,11 +34,11 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   // BGM再生
   let bgmAudio = null;
   let bgmPausedAt = 0;
-  const volume = localStorage.getItem('volume') !== null ? Number(localStorage.getItem('volume')) : 0.8;
+  const bgmVolume = localStorage.getItem('bgmVolume') !== null ? Number(localStorage.getItem('bgmVolume')) : 0.8;
   if (music && music.file) {
     bgmAudio = new Audio('music/' + music.file);
     bgmAudio.loop = false;
-    bgmAudio.volume = volume;
+    bgmAudio.volume = bgmVolume;
     bgmAudio.play();
   }
   function stopBgm() {
@@ -57,8 +63,8 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     <div id="gameRoot" style="position:fixed; left:0; top:0; width:100vw; height:100vh; background:#181818; border-radius:0; box-shadow:none; overflow:hidden; z-index:100;">
       <div id="gameArea" style="position:absolute; left:0; top:0; width:100vw; height:100vh; max-width:100vw; max-height:100vh;">
         <canvas id="gameCanvas" width="860" height="600" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#111; border-radius:18px; z-index:1;"></canvas>
-        <button id="pauseBtn" style="position:absolute; left:124px; top:18px; z-index:10; font-size:1.5em; padding:4px 16px; border-radius:8px;">⏸</button>
-        <div id="gameInfoBox" style="position:fixed; right:0; top:0; width:320px; min-height:180px; max-height:none; height:auto; z-index:200; display:flex; flex-direction:column; align-items:flex-end; padding:18px 12px 14px 14px; background:rgba(0,0,0,0.45); border-radius:0 0 0 24px; box-shadow:0 0 18px #0008;">
+        <button id="pauseBtn" style="position:absolute; left:124px; top:18px; z-index:10; font-size:1.5em; padding:4px 16px; border-radius:0;">⏸</button>
+        <div id="gameInfoBox" style="position:fixed; right:0; top:0; width:320px; min-height:180px; max-height:none; height:auto; z-index:200; display:flex; flex-direction:column; align-items:flex-end; padding:18px 12px 14px 14px; background:rgba(0,0,0,0.45); border-radius:0; box-shadow:0 0 18px #0008;">
         <span style="font-size:0.9em; color:#aaa; letter-spacing:0.1em; margin-bottom:4px; text-align:left; display:block; width:100%;">SCORE</span>
         <span id="scoreInfo" style="font-size:3.2em; color:#fff; font-weight:bold; letter-spacing:0.18em; margin-bottom:10px; text-shadow:0 0 12px #000,0 0 2px #000; font-family:'Share Tech Mono', 'Consolas', monospace;">00000000</span>
         <div id="progressBarContainer" style="width:320px; height:16px; margin-bottom:14px;"></div>
@@ -68,10 +74,10 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
       </div>
       <div id="pauseOverlay" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; flex-direction:column;">
         <div style="margin-top:40px; display:flex; flex-direction:column; align-items:center;">
-          <button id="resumeBtn" style="font-size:1.2em; margin-bottom:24px;">再開する</button>
+          <button id="resumeBtn" style="font-size:1.2em; margin-bottom:24px; border-radius:0;">再開する</button>
           <div id="countdown" style="font-size:2.5em; color:#fff; margin-bottom:16px;"></div>
-          <button id="retryBtn" style="font-size:1.2em; margin:12px 0;">リトライ</button><br>
-          <button id="interruptBtn" style="font-size:1.2em;">中断する</button>
+          <button id="retryBtn" style="font-size:1.2em; margin:12px 0; border-radius:0;">リトライ</button><br>
+          <button id="interruptBtn" style="font-size:1.2em; border-radius:0;">中断する</button>
         </div>
       </div>
       <div id="hpGaugeContainer" style="position:absolute; left:145px; top:118px; width:32px; height:440px; z-index:11; display:${mode==='hard'?'block':'none'};"></div>
@@ -92,13 +98,8 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   // 進捗バーをgameInfoBox幅-60pxに調整
   let progressBar = new ProgressBar(0, 0, 320, 16);
 
-  // 弾幕パターン例（今後拡張・外部データ化可）
-  const bulletPattern = [
-    // {time: 秒, config: {...}}
-    { time: 0.5, config: { x: 80, y: 80, angle: Math.PI/4, speed: 3, type: 'normal', color: '#f44' } },
-    { time: 1.0, config: { x: 560, y: 80, angle: Math.PI*3/4, speed: 2.5, type: 'bounce', bounce: 2, color: '#4f4' } },
-    { time: 1.5, config: { x: 320, y: 400, angle: -Math.PI/2, speed: 4, type: 'normal', color: '#ff0' } }
-  ];
+  // 選択曲・難易度の弾幕パターンを使用
+  const bulletPattern = (music?.patterns?.[difficulty]) ?? [];
   let bulletIndex = 0;
 
   // 曲の長さ（秒）
@@ -107,7 +108,7 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   let elapsed = 0;
   let hp = 3;
   const maxHp = 3;
-  let score = 0;
+  let score = 0.0;
   let damage = 0;
 
   // キー入力管理
@@ -199,9 +200,9 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
       gauge.style.display = 'block';
       const percent = Math.max(0, Math.min(1, hp / maxHp));
       gauge.innerHTML = `
-        <svg width="32" height="360">
-          <rect x="8" y="8" width="16" height="344" rx="8" fill="#333" stroke="#fff" stroke-width="2"/>
-          <rect x="8" y="8" width="16" height="${344 * percent}" rx="8" fill="#f44" style="transform: translateY(${344 * (1 - percent)}px);"/>
+        <svg width="32" height="520">
+          <rect x="8" y="8" width="16" height="504" rx="0" ry="0" fill="#333" stroke="#fff" stroke-width="2"/>
+          <rect x="8" y="8" width="16" height="${504 * percent}" rx="0" ry="0" fill="#f44" style="transform: translateY(${504 * (1 - percent)}px);"/>
         </svg>
         <div style="color:#fff; font-size:1em; text-align:center;">HP</div>
       `;
@@ -233,10 +234,17 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   }
 
   // ゲームループ
+  let prevTs = null;
   function loop(ts) {
     if (!startTime) startTime = ts;
     if (pauseState) return;
     elapsed = (ts - startTime) / 1000;
+    // 前フレームとの差分計算
+    let frameSec = 0;
+    if (prevTs !== null) {
+      frameSec = (ts - prevTs) / 1000;
+    }
+    prevTs = ts;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 枠描画
@@ -251,39 +259,100 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     player.draw(ctx);
 
     // 弾幕生成
+    // 移動範囲の各起点座標
+    const areaPoints = {
+      center: { x: area.x + area.width / 2, y: area.y + area.height / 2 },
+      left:   { x: area.x, y: area.y + area.height / 2 },
+      right:  { x: area.x + area.width, y: area.y + area.height / 2 },
+      top:    { x: area.x + area.width / 2, y: area.y },
+      bottom: { x: area.x + area.width / 2, y: area.y + area.height },
+    };
     while (bulletIndex < bulletPattern.length && bulletPattern[bulletIndex].time <= elapsed) {
-      bullets.push(new Bullet(bulletPattern[bulletIndex].config, area));
+      const pattern = bulletPattern[bulletIndex];
+      const cfg = { ...pattern.config };
+      const origin = cfg.origin || "center";
+      const base = areaPoints[origin] || areaPoints.center;
+      cfg.x = base.x + (cfg.x ?? 0);
+      cfg.y = base.y + (cfg.y ?? 0);
+      bullets.push(new Bullet(cfg, area));
       bulletIndex++;
     }
     // 弾幕更新・描画
     for (const b of bullets) b.update();
     for (const b of bullets) b.draw(ctx);
 
+    // スコア自動加算・減点分離
+    // フルスコア値
+    const fullScore = 10000000;
+    const scorePerSec = fullScore / musicDuration;
+    // 自動加算（floatで累積、表示時のみ整数化）
+    if (frameSec > 0) {
+      score += scorePerSec * frameSec;
+    }
     // 弾幕とプレイヤーの当たり判定
+    let overlapping = 0;
+    let hitDetected = false;
     for (const b of bullets) {
       if (!b.active) continue;
       const dist = Math.hypot(player.x - b.x, player.y - b.y);
       if (dist < player.radius + b.radius) {
-        b.active = false;
-        hp--;
-        damage++;
-        score = Math.max(0, score - 1); // 被弾時に1点減点、0未満にならない
-        playHitSE();
-        if (hp <= 0) {
-          // ゲームオーバー
-          stopBgm();
-          import('./main.js').then(mod => mod.navigate('result', { score, damage, musicId }));
-          return;
-        }
+        overlapping++;
+        hitDetected = true;
       }
     }
+    // 被弾時に点滅・SE
+    if (hitDetected) {
+      if (player.hitEffect === 0) {
+        player.hitEffect = 16; // 16フレーム点滅（約0.25秒）
+        playHitSE();
+      }
+    }
+    // 重なっている弾の数だけスコアを減点（0.01秒ごとに1点）
+    if (overlapping > 0) {
+      const minus = Math.floor(overlapping * frameSec / 0.01);
+      if (minus > 0) score = Math.max(0, score - minus);
+    }
+    // 上限制限
+    if (score > fullScore) score = fullScore;
 
-    // スコア加算（生存時間ベース例）
-    // スコア加算（フルスコアが10000000になるよう調整）
-    // 曲の長さmusicDuration（秒）で10000000点になるように
-    // 経過時間から直接算出（被弾時のみ減点）
-    const scorePerSec = 10000000 / musicDuration;
-    score = Math.max(0, Math.round(scorePerSec * elapsed) - damage);
+    // フルスコア演出
+    const fullScoreDivId = 'fullScoreEffect';
+    if (score === fullScore && !fullScoreShown) {
+      fullScoreShown = true;
+      fullScoreTimer = 2.0; // 2秒表示
+      let fsDiv = document.getElementById(fullScoreDivId);
+      if (!fsDiv) {
+        fsDiv = document.createElement('div');
+        fsDiv.id = fullScoreDivId;
+        fsDiv.style.position = 'fixed';
+        fsDiv.style.left = '50%';
+        fsDiv.style.top = '50%';
+        fsDiv.style.transform = 'translate(-50%,-50%)';
+        fsDiv.style.fontSize = '4em';
+        fsDiv.style.color = '#0ff';
+        fsDiv.style.fontWeight = 'bold';
+        fsDiv.style.textShadow = '0 0 24px #fff, 0 0 48px #0ff';
+        fsDiv.style.zIndex = '9999';
+        fsDiv.style.pointerEvents = 'auto';
+        fsDiv.textContent = 'FULLSCORE';
+        // クリックで消す
+        fsDiv.addEventListener('click', () => {
+          fsDiv.style.display = 'none';
+          fullScoreShown = false;
+        });
+        document.body.appendChild(fsDiv);
+      } else {
+        fsDiv.style.display = 'block';
+      }
+    }
+    if (fullScoreShown && fullScoreTimer > 0) {
+      fullScoreTimer -= frameSec;
+      if (fullScoreTimer <= 0) {
+        const fsDiv = document.getElementById(fullScoreDivId);
+        if (fsDiv) fsDiv.style.display = 'none';
+        fullScoreShown = false;
+      }
+    }
 
     // 進行バー（BGMのcurrentTime基準で正確に描画）
     let progress = 0;
@@ -295,8 +364,8 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     progressBar.setProgress(progress);
 
     // スコア・情報表示
-    // 8桁ゼロ埋め＆等幅表示
-    document.getElementById('scoreInfo').textContent = String(score).padStart(8, '0');
+    // 8桁ゼロ埋め＆等幅表示（表示時のみ整数化）
+    document.getElementById('scoreInfo').textContent = String(Math.floor(score)).padStart(8, '0');
     // Level表示
     const level = music?.levels?.[difficulty] ?? '-';
     document.getElementById('levelInfo').textContent = `Level: ${level}`;
