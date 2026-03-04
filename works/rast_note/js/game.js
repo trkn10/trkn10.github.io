@@ -24,9 +24,12 @@ if (localStorage.getItem('seVolume') !== null) {
 }
 
 export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
-    // フルスコア演出用
-    let fullScoreShown = false;
-    let fullScoreTimer = 0;
+  // FULLSCORE演出を画面遷移時に必ず消す
+  const fsDiv = document.getElementById('fullScoreEffect');
+  if (fsDiv) fsDiv.remove();
+  // フルスコア演出用
+  let fullScoreShown = false;
+  let fullScoreTimer = 0;
   pauseState = false;
   if (animationId) cancelAnimationFrame(animationId);
   const music = MUSIC_LIST.find(m => m.id === musicId);
@@ -93,7 +96,11 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   // canvasサイズ: 860x600, 操作範囲: 幅680, 高さ400
   // 中央配置のため x=(860-680)/2, y=(600-400)/2
   let area = new MoveArea(90, 100, 680, 400, 'rect');
-  let player = new Player(area);
+  // 左: WASD, 青  右: 矢印, 黄
+  let player1 = new Player(area, '#4af');
+  let player2 = new Player(area, '#ff0');
+  player1.x = area.x + area.width / 3;
+  player2.x = area.x + area.width * 2 / 3;
   let bullets = [];
   // 進捗バーをgameInfoBox幅-60pxに調整
   let progressBar = new ProgressBar(0, 0, 320, 16);
@@ -112,19 +119,27 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   let damage = 0;
 
   // キー入力管理
-  const keys = { w: false, a: false, s: false, d: false };
+  const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
   window.onkeydown = e => {
     if (e.repeat) return;
     if (e.key === 'w') keys.w = true;
     if (e.key === 'a') keys.a = true;
     if (e.key === 's') keys.s = true;
     if (e.key === 'd') keys.d = true;
+    if (e.key === 'ArrowUp') keys.ArrowUp = true;
+    if (e.key === 'ArrowDown') keys.ArrowDown = true;
+    if (e.key === 'ArrowLeft') keys.ArrowLeft = true;
+    if (e.key === 'ArrowRight') keys.ArrowRight = true;
   };
   window.onkeyup = e => {
     if (e.key === 'w') keys.w = false;
     if (e.key === 'a') keys.a = false;
     if (e.key === 's') keys.s = false;
     if (e.key === 'd') keys.d = false;
+    if (e.key === 'ArrowUp') keys.ArrowUp = false;
+    if (e.key === 'ArrowDown') keys.ArrowDown = false;
+    if (e.key === 'ArrowLeft') keys.ArrowLeft = false;
+    if (e.key === 'ArrowRight') keys.ArrowRight = false;
   };
 
   // ポーズ処理
@@ -249,14 +264,22 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
 
     // 枠描画
     area.draw(ctx);
-    // プレイヤー移動
-    let dx = (keys.d ? 1 : 0) - (keys.a ? 1 : 0);
-    let dy = (keys.s ? 1 : 0) - (keys.w ? 1 : 0);
-    if (dx || dy) {
-      const len = Math.hypot(dx, dy);
-      player.move(dx / (len || 1), dy / (len || 1));
+    // プレイヤー1移動（WASD）
+    let dx1 = (keys.d ? 1 : 0) - (keys.a ? 1 : 0);
+    let dy1 = (keys.s ? 1 : 0) - (keys.w ? 1 : 0);
+    if (dx1 || dy1) {
+      const len = Math.hypot(dx1, dy1);
+      player1.move(dx1 / (len || 1), dy1 / (len || 1));
     }
-    player.draw(ctx);
+    // プレイヤー2移動（矢印キー）
+    let dx2 = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
+    let dy2 = (keys.ArrowDown ? 1 : 0) - (keys.ArrowUp ? 1 : 0);
+    if (dx2 || dy2) {
+      const len = Math.hypot(dx2, dy2);
+      player2.move(dx2 / (len || 1), dy2 / (len || 1));
+    }
+    player1.draw(ctx);
+    player2.draw(ctx);
 
     // 弾幕生成
     // 移動範囲の各起点座標
@@ -291,21 +314,30 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     }
     // 弾幕とプレイヤーの当たり判定
     let overlapping = 0;
-    let hitDetected = false;
+    let hit1 = false, hit2 = false;
     for (const b of bullets) {
       if (!b.active) continue;
-      const dist = Math.hypot(player.x - b.x, player.y - b.y);
-      if (dist < player.radius + b.radius) {
-        overlapping++;
-        hitDetected = true;
+      let overlapCount = 0;
+      const dist1 = Math.hypot(player1.x - b.x, player1.y - b.y);
+      if (dist1 < player1.radius + b.radius) {
+        overlapCount++;
+        hit1 = true;
       }
+      const dist2 = Math.hypot(player2.x - b.x, player2.y - b.y);
+      if (dist2 < player2.radius + b.radius) {
+        overlapCount++;
+        hit2 = true;
+      }
+      overlapping += overlapCount;
     }
     // 被弾時に点滅・SE
-    if (hitDetected) {
-      if (player.hitEffect === 0) {
-        player.hitEffect = 16; // 16フレーム点滅（約0.25秒）
-        playHitSE();
-      }
+    if (hit1 && player1.hitEffect === 0) {
+      player1.hitEffect = 16;
+      playHitSE();
+    }
+    if (hit2 && player2.hitEffect === 0) {
+      player2.hitEffect = 16;
+      playHitSE();
     }
     // 重なっている弾の数だけスコアを減点（0.01秒ごとに1点）
     if (overlapping > 0) {

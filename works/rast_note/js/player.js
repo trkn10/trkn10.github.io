@@ -1,6 +1,6 @@
 // プレイヤー管理
 export class Player {
-  constructor(area) {
+  constructor(area, color = '#4af') {
     this.x = area.x + area.width / 2;
     this.y = area.y + area.height / 2;
     this.radius = 12;
@@ -8,6 +8,7 @@ export class Player {
     this.area = area;
     this.alive = true;
     this.hitEffect = 0; // 被弾点滅フレーム数
+    this.baseColor = color;
   }
   move(dx, dy) {
     const nx = this.x + dx * this.speed;
@@ -20,11 +21,11 @@ export class Player {
     ctx.save();
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    // 被弾点滅中は赤色、それ以外は通常色
+    // 被弾点滅中は赤色、それ以外はbaseColor
     if (this.hitEffect > 0 && Math.floor(this.hitEffect / 2) % 2 === 0) {
       ctx.fillStyle = '#f44';
     } else {
-      ctx.fillStyle = '#4af';
+      ctx.fillStyle = this.baseColor;
     }
     ctx.fill();
     ctx.restore();

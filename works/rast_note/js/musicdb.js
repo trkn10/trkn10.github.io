@@ -19,11 +19,11 @@ export const MUSIC_LIST = [
     },
     patterns: {
       prelude: [
-        { time: 0.5, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: '#0ff', origin: 'center' } },
-        { time: 1.0, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: '#f44', origin: 'left' } },
-        { time: 1.5, config: { x: 0, y: 0, angle: Math.PI, speed: 2, type: 'normal', color: '#4f4', origin: 'right' } },
-        { time: 2.0, config: { x: 0, y: 0, angle: Math.PI/2, speed: 2, type: 'normal', color: '#ff0', origin: 'top' } },
-        { time: 2.5, config: { x: 0, y: 0, angle: -Math.PI/2, speed: 2, type: 'normal', color: '#00f', origin: 'bottom' } },
+        { time: 0.5, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: 'rgb(255, 255, 255)', origin: 'center' } },
+        { time: 1.0, config: { x: 0, y: 0, angle: 0, speed: 2, type: 'normal', color: 'rgb(255, 255, 255)', origin: 'left' } },
+        { time: 1.5, config: { x: 0, y: 0, angle: Math.PI, speed: 2, type: 'normal', color: 'rgb(255, 255, 255)', origin: 'right' } },
+        { time: 2.0, config: { x: 0, y: 0, angle: Math.PI/2, speed: 2, type: 'normal', color: 'rgb(255, 255, 255)', origin: 'top' } },
+        { time: 2.5, config: { x: 0, y: 0, angle: -Math.PI/2, speed: 2, type: 'normal', color: 'rgb(255, 255, 255)', origin: 'bottom' } },
       ],
       refrain: [
         { time: 0.5, config: { x: 100, y: 100, angle: Math.PI/4, speed: 2.5, type: 'normal', color: '#f44' } },
