@@ -1,0 +1,16 @@
+body {
+  background: #111;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+}
+button {
+  margin: 8px;
+  padding: 8px 24px;
+  font-size: 1.1em;
+}
+#gameCanvas {
+  background: #222;
+  margin: 16px auto;
+  display: block;
+}
