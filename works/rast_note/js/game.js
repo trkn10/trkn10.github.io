@@ -54,18 +54,19 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     }
   }
   app.innerHTML = `
-    <div style="position:relative; width:1280px; height:720px; margin:0 auto; background:#111; border-radius:18px; overflow:hidden;">
-      <button id="pauseBtn" style="position:absolute; left:0; top:0; z-index:10;">⏸</button>
-      <canvas id="gameCanvas" width="960" height="720" style="position:absolute; left:320px; top:0; background:#111;"></canvas>
-      <div id="gameInfoBox" style="position:absolute; left:0; top:0; width:320px; height:100%; z-index:12; display:flex; flex-direction:column; align-items:flex-end; padding:32px 18px 18px 24px; background:rgba(0,0,0,0.45); border-radius:0 24px 24px 0; box-shadow:0 0 16px #0008;">
-        <span style="font-size:0.9em; color:#aaa; letter-spacing:0.1em; margin-bottom:4px;">SCORE</span>
-        <span id="scoreInfo" style="font-size:3.2em; color:#fff; font-weight:bold; letter-spacing:0.05em; margin-bottom:10px; text-shadow:0 0 12px #000,0 0 2px #000;">0</span>
-        <div id="progressBarContainer" style="width:256px; height:14px; margin-bottom:10px;"></div>
+    <div id="gameRoot" style="position:fixed; left:0; top:0; width:100vw; height:100vh; background:#181818; border-radius:0; box-shadow:none; overflow:hidden; z-index:100;">
+      <div id="gameArea" style="position:absolute; left:0; top:0; width:100vw; height:100vh; max-width:100vw; max-height:100vh;">
+        <canvas id="gameCanvas" width="860" height="600" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#111; border-radius:18px; z-index:1;"></canvas>
+        <button id="pauseBtn" style="position:absolute; left:124px; top:18px; z-index:10; font-size:1.5em; padding:4px 16px; border-radius:8px;">⏸</button>
+        <div id="gameInfoBox" style="position:fixed; right:0; top:0; width:320px; min-height:180px; max-height:none; height:auto; z-index:200; display:flex; flex-direction:column; align-items:flex-end; padding:18px 12px 14px 14px; background:rgba(0,0,0,0.45); border-radius:0 0 0 24px; box-shadow:0 0 18px #0008;">
+        <span style="font-size:0.9em; color:#aaa; letter-spacing:0.1em; margin-bottom:4px; text-align:left; display:block; width:100%;">SCORE</span>
+        <span id="scoreInfo" style="font-size:3.2em; color:#fff; font-weight:bold; letter-spacing:0.18em; margin-bottom:10px; text-shadow:0 0 12px #000,0 0 2px #000; font-family:'Share Tech Mono', 'Consolas', monospace;">00000000</span>
+        <div id="progressBarContainer" style="width:320px; height:16px; margin-bottom:14px;"></div>
         <span id="levelInfo" style="font-size:1.1em; color:#ffb347; margin-bottom:4px;">Level: -</span>
         <span id="musicTitleInfo" style="font-size:1.2em; color:#fff; margin-bottom:2px; text-align:right; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${music?.title || ''}</span>
         <span id="artistInfo" style="font-size:1em; color:#aaa; text-align:right; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${music?.artist || ''}</span>
       </div>
-      <div id="pauseOverlay" style="display:none; position:absolute; left:0; top:0; width:1280px; height:720px; background:rgba(0,0,0,0.7); z-index:20; align-items:center; justify-content:center; flex-direction:column;">
+      <div id="pauseOverlay" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; flex-direction:column;">
         <div style="margin-top:40px; display:flex; flex-direction:column; align-items:center;">
           <button id="resumeBtn" style="font-size:1.2em; margin-bottom:24px;">再開する</button>
           <div id="countdown" style="font-size:2.5em; color:#fff; margin-bottom:16px;"></div>
@@ -73,7 +74,7 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
           <button id="interruptBtn" style="font-size:1.2em;">中断する</button>
         </div>
       </div>
-      <div id="hpGaugeContainer" style="position:absolute; left:0; top:160px; width:32px; height:400px; display:${mode==='hard'?'block':'none'};"></div>
+      <div id="hpGaugeContainer" style="position:absolute; left:145px; top:118px; width:32px; height:440px; z-index:11; display:${mode==='hard'?'block':'none'};"></div>
     </div>
   `;
 
@@ -82,12 +83,14 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
   const pauseBtn = document.getElementById('pauseBtn');
   const pauseOverlay = document.getElementById('pauseOverlay');
 
-  // 移動範囲（今後拡張可）
-  let area = new MoveArea(380, 160, 560, 400, 'rect');
+  // 操作範囲をcanvas中央に配置
+  // canvasサイズ: 860x600, 操作範囲: 幅680, 高さ400
+  // 中央配置のため x=(860-680)/2, y=(600-400)/2
+  let area = new MoveArea(90, 100, 680, 400, 'rect');
   let player = new Player(area);
   let bullets = [];
-  // 進捗バーをgameInfoBox幅-64pxに調整
-  let progressBar = new ProgressBar(0, 0, 256, 14);
+  // 進捗バーをgameInfoBox幅-60pxに調整
+  let progressBar = new ProgressBar(0, 0, 320, 16);
 
   // 弾幕パターン例（今後拡張・外部データ化可）
   const bulletPattern = [
@@ -191,16 +194,21 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
 
   // HPゲージ描画
   function drawHpGauge() {
-    if (mode !== 'hard') return;
     const gauge = document.getElementById('hpGaugeContainer');
-    const percent = Math.max(0, Math.min(1, hp / maxHp));
-    gauge.innerHTML = `
-      <svg width="32" height="360">
-        <rect x="8" y="8" width="16" height="344" rx="8" fill="#333" stroke="#fff" stroke-width="2"/>
-        <rect x="8" y="8" width="16" height="${344 * percent}" rx="8" fill="#f44" style="transform: translateY(${344 * (1 - percent)}px);"/>
-      </svg>
-      <div style="color:#fff; font-size:1em; text-align:center;">HP</div>
-    `;
+    if (mode === 'hard') {
+      gauge.style.display = 'block';
+      const percent = Math.max(0, Math.min(1, hp / maxHp));
+      gauge.innerHTML = `
+        <svg width="32" height="360">
+          <rect x="8" y="8" width="16" height="344" rx="8" fill="#333" stroke="#fff" stroke-width="2"/>
+          <rect x="8" y="8" width="16" height="${344 * percent}" rx="8" fill="#f44" style="transform: translateY(${344 * (1 - percent)}px);"/>
+        </svg>
+        <div style="color:#fff; font-size:1em; text-align:center;">HP</div>
+      `;
+    } else {
+      gauge.style.display = 'none';
+      gauge.innerHTML = '';
+    }
   }
 
   // 進捗バー描画
@@ -209,13 +217,18 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     // canvasを使って描画
     if (!container.querySelector('canvas')) {
       const barCanvas = document.createElement('canvas');
-      barCanvas.width = 120;
-      barCanvas.height = 8;
+      barCanvas.width = 320;
+      barCanvas.height = 16;
       container.appendChild(barCanvas);
     }
     const barCanvas = container.querySelector('canvas');
+    // サイズが違う場合は修正
+    if (barCanvas.width !== 320 || barCanvas.height !== 16) {
+      barCanvas.width = 320;
+      barCanvas.height = 16;
+    }
     const barCtx = barCanvas.getContext('2d');
-    barCtx.clearRect(0, 0, 120, 8);
+    barCtx.clearRect(0, 0, 320, 16);
     progressBar.draw(barCtx);
   }
 
@@ -266,7 +279,11 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     }
 
     // スコア加算（生存時間ベース例）
-    score += 1; // 毎フレーム1点加算例（必要に応じて調整）
+    // スコア加算（フルスコアが10000000になるよう調整）
+    // 曲の長さmusicDuration（秒）で10000000点になるように
+    // 経過時間から直接算出（被弾時のみ減点）
+    const scorePerSec = 10000000 / musicDuration;
+    score = Math.max(0, Math.round(scorePerSec * elapsed) - damage);
 
     // 進行バー（BGMのcurrentTime基準で正確に描画）
     let progress = 0;
@@ -278,7 +295,8 @@ export function startGame(app, { musicId, difficulty, mode = 'normal' }) {
     progressBar.setProgress(progress);
 
     // スコア・情報表示
-    document.getElementById('scoreInfo').textContent = score;
+    // 8桁ゼロ埋め＆等幅表示
+    document.getElementById('scoreInfo').textContent = String(score).padStart(8, '0');
     // Level表示
     const level = music?.levels?.[difficulty] ?? '-';
     document.getElementById('levelInfo').textContent = `Level: ${level}`;

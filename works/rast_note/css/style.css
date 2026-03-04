@@ -1,3 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&display=swap');
+
+body {
+  background: #10131a;
+  color: #eaf6ff;
+  font-family: 'Orbitron', 'Share Tech Mono', 'Segoe UI', monospace, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+#gameCanvas {
+  background: #181c24;
+  box-shadow: 0 0 32px #00f4ff44, 0 0 8px #0ff8, 0 0 0 #000;
+  border: 2.5px solid #0ff;
+  border-radius: 18px;
+}
+
+#gameInfoBox {
+  background: rgba(10,20,40,0.72);
+  box-shadow: 0 0 32px #00f4ff55, 0 0 8px #0ff8;
+  border-left: 3.5px solid #0ff;
+  border-radius: 0 0 0 32px;
+  font-family: 'Orbitron', 'Share Tech Mono', monospace;
+}
+
+#scoreInfo {
+  color: #00f4ff;
+  text-shadow: 0 0 12px #00f4ff, 0 0 2px #fff, 0 0 24px #0ff8;
+  font-family: 'Orbitron', 'Share Tech Mono', monospace;
+}
+
+#progressBarContainer canvas {
+  border-radius: 8px;
+  box-shadow: 0 0 12px #00f4ff88, 0 0 2px #0ff8;
+  background: linear-gradient(90deg, #0ff 0%, #00f4ff 100%);
+}
+
+#levelInfo {
+  color: #ff6ec7;
+  text-shadow: 0 0 8px #ff6ec7, 0 0 2px #fff;
+}
+
+#musicTitleInfo, #artistInfo {
+  color: #fff;
+  text-shadow: 0 0 6px #00f4ff88;
+}
+
+#pauseBtn, #resumeBtn, #retryBtn, #interruptBtn {
+  background: rgba(10,20,40,0.85);
+  color: #0ff;
+  border: 2px solid #0ff;
+  border-radius: 12px;
+  font-family: 'Orbitron', 'Share Tech Mono', monospace;
+  box-shadow: 0 0 8px #00f4ff88;
+  transition: box-shadow 0.2s, border-color 0.2s, color 0.2s;
+}
+#pauseBtn:hover, #resumeBtn:hover, #retryBtn:hover, #interruptBtn:hover {
+  color: #fff;
+  border-color: #ff6ec7;
+  box-shadow: 0 0 24px #ff6ec7cc, 0 0 8px #0ff8;
+}
+
+#hpGaugeContainer {
+  background: none !important;
+  box-shadow: 0 0 16px #ff2f6e88, 0 0 4px #fff2;
+  border-radius: 16px;
+}
+
+#hpGaugeContainer svg {
+  filter: drop-shadow(0 0 8px #ff2f6e) drop-shadow(0 0 2px #fff8);
+}
+
+#hpGaugeContainer div {
+  color: #ff6ec7;
+  text-shadow: 0 0 8px #ff6ec7, 0 0 2px #fff;
+  font-family: 'Orbitron', 'Share Tech Mono', monospace;
+}
+
+/* サイバーなグリッド背景例 */
+.cyber-bg {
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(90deg, #0ff1 0 2px, transparent 2px 80px), repeating-linear-gradient(0deg, #0ff1 0 2px, transparent 2px 80px);
+}
 body {
   background: #111;
   color: #fff;
