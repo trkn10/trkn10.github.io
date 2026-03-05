@@ -3,14 +3,24 @@
 let timelineData = [];
 let selectedIndex = null;
 let audio = null;
+
+
 let isPlaying = false;
 let timelineCurrent = 0;
+window.timelineCurrent = 0;
+let previewAnimId = null;
+let timelineAnimId = null;
+let lastPreviewTime = null;
+// 曲の再生中に最大currentTimeを記録
+let timelineMaxTime = 0;
+
 
 const previewCanvas = document.getElementById('previewCanvas');
 const ctx = previewCanvas.getContext('2d');
 const playBtn = document.getElementById('playBtn');
 const musicFile = document.getElementById('musicFile');
-const timeline = document.getElementById('timeline');
+const timelineCanvas = document.getElementById('timelineCanvas');
+const timelineTime = document.getElementById('timelineTime');
 const audioVolume = document.getElementById('audioVolume');
 const jsonText = document.getElementById('jsonText');
 const copyJson = document.getElementById('copyJson');
@@ -46,36 +56,68 @@ inspDelete.onclick = () => {
   inspColor.value = '#ffffff';
 };
 
-// deleteキーで選択中の弾幕削除
+// deleteキーで選択中の弾幕削除 & スペースキーで再生/一時停止
 document.addEventListener('keydown', e => {
+  // input/textareaにフォーカス中はスペース・矢印操作を無効化
+  const isInput = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
   if (e.key === 'Delete' && selectedIndex != null) {
     inspDelete.onclick();
-    // フォーカスがinput等の場合はデフォルト動作を防ぐ
-    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-      e.preventDefault();
+    if (isInput) e.preventDefault();
+  }
+  if ((e.key === ' ' || e.code === 'Space') && !isInput) {
+    playBtn.click();
+    e.preventDefault();
+  }
+  // 矢印キーで現在位置バー微調整
+  if (!isInput && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    // duration決定ロジックをcanvas側と統一
+    let duration = 30;
+    if (audio && !isNaN(audio.duration) && audio.duration > 0) {
+      duration = audio.duration;
+    } else if (typeof audio?.timelineMaxTime === 'number' && audio.timelineMaxTime > 0) {
+      duration = audio.timelineMaxTime;
     }
+    let step = 1/60; // デフォルト1フレーム(約0.0167秒)
+    if (e.ctrlKey) step = 1/240; // Ctrlでさらに細かく
+    if (e.shiftKey) step = 1/10; // Shiftで大きく
+    if (e.key === 'ArrowLeft') timelineCurrent = Math.max(0, +(timelineCurrent - step).toFixed(4));
+    if (e.key === 'ArrowRight') timelineCurrent = Math.min(duration, +(timelineCurrent + step).toFixed(4));
+    if (audio) audio.currentTime = timelineCurrent;
+    renderPreview(timelineCurrent);
+    renderTimeline();
+    e.preventDefault();
   }
 });
+
 
 function renderPreview(time) {
   ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   // 枠
   ctx.strokeStyle = '#fff';
   ctx.strokeRect(0, 0, previewCanvas.width, previewCanvas.height);
-  // 弾幕
+  // 弾幕（発射後は進行位置を計算して描画）
   for (let i = 0; i < timelineData.length; ++i) {
     const b = timelineData[i];
     if (b.time > time) continue;
-    ctx.save();
-    ctx.beginPath();
-    // 起点計算
+    // 経過時間
+    const t = time - b.time;
+    // 起点
     let ox = previewCanvas.width/2, oy = previewCanvas.height/2;
     if (b.origin === 'left')   { ox = 0; oy = previewCanvas.height/2; }
     if (b.origin === 'right')  { ox = previewCanvas.width; oy = previewCanvas.height/2; }
     if (b.origin === 'top')    { ox = previewCanvas.width/2; oy = 0; }
     if (b.origin === 'bottom') { ox = previewCanvas.width/2; oy = previewCanvas.height; }
-    const x = ox + (b.x||0);
-    const y = oy + (b.y||0);
+    // 初期位置
+    let x = ox + (b.x||0);
+    let y = oy + (b.y||0);
+    // 進行（速度・角度）
+    if (b.speed && b.angle != null) {
+      const rad = (b.angle || 0) * Math.PI / 180;
+      x += Math.cos(rad) * b.speed * t * 30; // 速度は1で30px/s基準
+      y += Math.sin(rad) * b.speed * t * 30;
+    }
+    ctx.save();
+    ctx.beginPath();
     ctx.arc(x, y, 12, 0, Math.PI*2);
     ctx.fillStyle = b.color || '#fff';
     ctx.globalAlpha = (selectedIndex === i) ? 1 : 0.7;
@@ -84,53 +126,67 @@ function renderPreview(time) {
   }
 }
 
-let isDraggingTimeline = false;
-function renderTimeline() {
-  timeline.innerHTML = '';
-  const width = timeline.offsetWidth || 600;
-  const duration = audio && audio.duration ? audio.duration : 30;
-  // 軸
-  const axis = document.createElement('div');
-  axis.style.position = 'relative';
-  axis.style.height = '80px';
-  axis.style.background = '#222';
-  axis.style.borderRadius = '16px';
-  axis.style.margin = '8px 0';
-  axis.style.width = '100%';
-  timeline.appendChild(axis);
-  // 弾幕ノード
-  for (let i = 0; i < timelineData.length; ++i) {
-    const b = timelineData[i];
-    const left = Math.max(0, Math.min(1, b.time/duration)) * width;
-    const node = document.createElement('div');
-    node.style.position = 'absolute';
-    node.style.left = `${left-16}px`;
-    node.style.top = '20px';
-    node.style.width = '32px';
-    node.style.height = '32px';
-    node.style.borderRadius = '50%';
-    node.style.background = b.color || '#fff';
-    node.style.border = (selectedIndex === i) ? '3px solid #0ff' : '3px solid #444';
-    node.style.cursor = 'pointer';
-    node.title = `t=${b.time}`;
-    node.onclick = () => selectBullet(i);
-    axis.appendChild(node);
+function startPreviewLoop() {
+  if (previewAnimId) cancelAnimationFrame(previewAnimId);
+  if (timelineAnimId) cancelAnimationFrame(timelineAnimId);
+  function loop() {
+    let shouldContinue = false;
+    if (isPlaying && audio) {
+      timelineCurrent = audio.currentTime;
+      // 再生中は最大値を記録
+      if (timelineCurrent > timelineMaxTime) timelineMaxTime = timelineCurrent;
+      window.timelineCurrent = timelineCurrent;
+      shouldContinue = true;
+    }
+    if (!isPlaying && isDraggingTimeline) {
+      window.timelineCurrent = timelineCurrent;
+      shouldContinue = true;
+    }
+    window.timelineCurrent = timelineCurrent;
+    renderPreview(Math.round(timelineCurrent * 100) / 100);
+    renderTimeline();
+    if (shouldContinue) {
+      previewAnimId = requestAnimationFrame(loop);
+    } else {
+      previewAnimId = null;
+    }
   }
-  // 現在位置バー
-  const cur = document.createElement('div');
-  cur.style.position = 'absolute';
-  cur.style.left = `${Math.max(0, Math.min(1, timelineCurrent/duration)) * width}px`;
-  cur.style.top = '0';
-  cur.style.width = '4px';
-  cur.style.height = '100%';
-  cur.style.background = '#0ff';
-  cur.style.cursor = 'ew-resize';
-  cur.onmousedown = e => {
-    isDraggingTimeline = true;
-    document.body.style.userSelect = 'none';
-    e.stopPropagation();
-  };
-  axis.appendChild(cur);
+  previewAnimId = requestAnimationFrame(loop);
+}
+
+function renderTimeline() {
+  if (timelineTime) timelineTime.textContent = timelineCurrent.toFixed(2);
+  if (window.timelineCanvasApi) {
+    // timelineMaxTimeもaudioに必ず付与して返す
+    window.timelineCanvasApi.setAccessors({
+      getTimelineData: () => timelineData,
+      getTimelineCurrent: () => timelineCurrent,
+      getAudio: () => {
+        if (!audio) return { timelineMaxTime };
+        // timelineMaxTimeを常に付与（enumerableでない場合も明示的に）
+        if (typeof audio.timelineMaxTime !== 'number' || audio.timelineMaxTime !== timelineMaxTime) {
+          Object.defineProperty(audio, 'timelineMaxTime', {
+            value: timelineMaxTime,
+            writable: true,
+            configurable: true,
+            enumerable: true
+          });
+        }
+        return audio;
+      },
+      getSelectedIndex: () => selectedIndex,
+      setTimelineCurrent: v => {
+        timelineCurrent = v;
+        window.timelineCurrent = v;
+        if (audio && isPlaying) audio.currentTime = v;
+        renderPreview(timelineCurrent);
+        renderTimeline();
+      },
+      setSelectedIndex: idx => { selectedIndex = idx; },
+      onUpdate: () => { renderPreview(timelineCurrent); renderTimeline(); updateJson(); },
+    });
+    window.timelineCanvasApi.renderTimeline();
+  }
 }
 
 function updateJson() {
@@ -173,17 +229,21 @@ copyJson.onclick = () => {
   document.execCommand('copy');
 };
 
+
 playBtn.onclick = () => {
   if (!audio) return;
   if (isPlaying) {
     audio.pause();
     playBtn.textContent = '▶';
     isPlaying = false;
+    if (previewAnimId) cancelAnimationFrame(previewAnimId);
+    previewAnimId = null;
   } else {
     audio.currentTime = timelineCurrent;
     audio.play();
     playBtn.textContent = '⏸';
     isPlaying = true;
+    startPreviewLoop();
   }
 };
 
@@ -191,6 +251,7 @@ musicFile.onchange = e => {
   const file = e.target.files[0];
   if (!file) return;
   if (audio) audio.pause();
+  timelineMaxTime = 0; // 曲切り替え時に必ず初期化
   audio = new Audio(URL.createObjectURL(file));
   audio.volume = parseFloat(audioVolume.value);
   audio.onloadedmetadata = () => {
@@ -198,8 +259,10 @@ musicFile.onchange = e => {
   };
   audio.ontimeupdate = () => {
     timelineCurrent = audio.currentTime;
-    renderPreview(timelineCurrent);
+    if (timelineCurrent > timelineMaxTime) timelineMaxTime = timelineCurrent;
     renderTimeline();
+    if (timelineTime) timelineTime.textContent = timelineCurrent.toFixed(2);
+    // プレビューはrequestAnimationFrameで滑らかに描画
   };
   audio.onpause = () => {
     playBtn.textContent = '▶';
@@ -225,11 +288,8 @@ timeline.onmousedown = e => {
   if (e.button !== 0) return;
   // 弾幕ノード上かどうか判定
   let target = e.target;
-  // ノードは32x32, border-radius:50% で生成されている
   if (target !== timeline) {
-    // ノードか現在位置バー以外は無視
     if (target.style && (target.style.width === '32px' && target.style.height === '32px')) {
-      // 弾幕ノード上なら何もしない（selectBulletはnode.onclickで処理済み）
       return;
     }
   }
@@ -238,11 +298,25 @@ timeline.onmousedown = e => {
   const rect = timeline.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const width = timeline.offsetWidth || 600;
-  const duration = audio && audio.duration ? audio.duration : 30;
-  timelineCurrent = Math.max(0, Math.min(1, x / width)) * duration;
+  // duration決定ロジックをcanvas側と統一
+  let duration = 30;
+  if (audio && !isNaN(audio.duration) && audio.duration > 0) {
+    duration = audio.duration;
+  } else if (typeof audio?.timelineMaxTime === 'number' && audio.timelineMaxTime > 0) {
+    duration = audio.timelineMaxTime;
+  }
+  // x=0→timelineCurrent=0, x=width→timelineCurrent=duration
+  let ratio = x / width;
+  if (ratio <= 0) {
+    timelineCurrent = 0;
+  } else if (ratio >= 1) {
+    timelineCurrent = duration;
+  } else {
+    timelineCurrent = +(ratio * duration).toFixed(4);
+  }
   if (audio) audio.currentTime = timelineCurrent;
-  renderPreview(timelineCurrent);
   renderTimeline();
+  startPreviewLoop();
 };
 
 document.addEventListener('mousemove', e => {
@@ -250,46 +324,102 @@ document.addEventListener('mousemove', e => {
   const rect = timeline.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const width = timeline.offsetWidth || 600;
-  const duration = audio && audio.duration ? audio.duration : 30;
-  timelineCurrent = Math.max(0, Math.min(1, x / width)) * duration;
+  // duration決定ロジックをcanvas側と統一
+  let duration = 30;
+  if (audio && !isNaN(audio.duration) && audio.duration > 0) {
+    duration = audio.duration;
+  } else if (typeof audio?.timelineMaxTime === 'number' && audio.timelineMaxTime > 0) {
+    duration = audio.timelineMaxTime;
+  }
+  let ratio = x / width;
+  if (ratio <= 0) {
+    timelineCurrent = 0;
+  } else if (ratio >= 1) {
+    timelineCurrent = duration;
+  } else {
+    timelineCurrent = +(ratio * duration).toFixed(4);
+  }
   if (audio) audio.currentTime = timelineCurrent;
-  renderPreview(timelineCurrent);
   renderTimeline();
+  startPreviewLoop();
 });
 document.addEventListener('mouseup', e => {
   if (isDraggingTimeline) {
     isDraggingTimeline = false;
     document.body.style.userSelect = '';
+    renderPreview(timelineCurrent);
+    if (previewAnimId) cancelAnimationFrame(previewAnimId);
+    previewAnimId = null;
   }
 });
 
-// 弾幕追加（タイムライン上ダブルクリックで追加）
-timeline.ondblclick = e => {
-  const rect = timeline.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const width = timeline.offsetWidth || 600;
-  const duration = audio && audio.duration ? audio.duration : 30;
-  const t = (x / width) * duration;
-  const newBullet = {
-    time: t,
-    type: 'normal',
-    origin: 'center',
-    x: 0, y: 0,
-    angle: 0,
-    speed: 2,
-    color: '#ffffff'
+// タイムラインcanvasから弾幕追加
+if (window.timelineCanvasApi) {
+  window.timelineCanvasApi.onAddBullet = t => {
+    const newBullet = {
+      time: t,
+      type: 'normal',
+      origin: 'center',
+      x: 0, y: 0,
+      angle: 0,
+      speed: 2,
+      color: '#ffffff'
+    };
+    timelineData.push(newBullet);
+    selectedIndex = timelineData.length - 1;
+    renderPreview(timelineCurrent);
+    renderTimeline();
+    updateJson();
+    selectBullet(selectedIndex);
   };
-  timelineData.push(newBullet);
-  selectedIndex = timelineData.length - 1;
-  renderPreview(timelineCurrent);
-  renderTimeline();
-  updateJson();
-  selectBullet(selectedIndex);
-};
+}
 
 // 初期化
 window.onload = () => {
+  // timeline-canvas.js連携
+  if (window.timelineCanvasApi) {
+    window.timelineCanvasApi.setAccessors({
+      getTimelineData: () => timelineData,
+      getTimelineCurrent: () => timelineCurrent,
+      getAudio: () => audio,
+      getSelectedIndex: () => selectedIndex,
+      setTimelineCurrent: v => {
+        timelineCurrent = v;
+        window.timelineCurrent = v;
+        if (audio && isPlaying) audio.currentTime = v;
+        renderPreview(timelineCurrent);
+        renderTimeline();
+      },
+      setSelectedIndex: idx => { selectedIndex = idx; },
+      onUpdate: () => { renderPreview(timelineCurrent); renderTimeline(); updateJson(); },
+    });
+    window.timelineCanvasApi.onAddBullet = t => {
+      const newBullet = {
+        time: t,
+        type: 'normal',
+        origin: 'center',
+        x: 0, y: 0,
+        angle: 0,
+        speed: 2,
+        color: '#ffffff'
+      };
+      timelineData.push(newBullet);
+      selectedIndex = timelineData.length - 1;
+      renderPreview(timelineCurrent);
+      renderTimeline();
+      updateJson();
+      selectBullet(selectedIndex);
+    };
+  }
   renderPreview(0);
   renderTimeline();
   updateJson();
+  if (timelineTime) timelineTime.textContent = '0.00';
+  // 再生停止中も常時バーを動かす
+  function idleLoop() {
+    window.timelineCurrent = timelineCurrent;
+    renderTimeline();
+    requestAnimationFrame(idleLoop);
+  }
+  idleLoop();
 };

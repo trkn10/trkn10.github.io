@@ -39,9 +39,13 @@
         </div>
         <div style="flex:1;"></div>
       </div>
-      <div id="timeline"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="timelineTime" style="min-width:60px;text-align:right;font-family:monospace;color:#0ff;">0.00</span>
+        <canvas id="timelineCanvas" width="1200" height="80" style="flex:1;max-width:100%;background:#222;border-radius:16px;"></canvas>
+      </div>
     </div>
   </div>
+  <script src="js/timeline-canvas.js"></script>
   <script src="js/editor.js"></script>
 </body>
 </html>
