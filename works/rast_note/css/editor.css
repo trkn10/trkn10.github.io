@@ -1,0 +1,99 @@
+#editorRoot {
+  width: 100vw;
+  height: 100vh;
+  background: #181818;
+  display: flex;
+  flex-direction: column;
+}
+#previewArea {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  gap: 32px;
+}
+#previewCanvas {
+  background: #111;
+  border-radius: 18px;
+  box-shadow: 0 0 18px #0008;
+  border: 2px solid #fff;
+}
+#inspector {
+  position: absolute;
+  right: 5vw;
+  top: 40px;
+  background: #222;
+  color: #fff;
+  padding: 16px 18px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #000a;
+  min-width: 220px;
+  z-index: 10;
+}
+#jsonOutput {
+  position: absolute;
+  left: 2vw;
+  top: 40px;
+  background: #222;
+  color: #fff;
+  padding: 16px 18px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #000a;
+  min-width: 260px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+#jsonText {
+  width: 220px;
+  height: 180px;
+  background: #111;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-family: 'Consolas', monospace;
+  font-size: 0.95em;
+  resize: none;
+}
+#timelineArea {
+  width: 100vw;
+  padding: 0 7vw 0 7vw;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+#timelineControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 100%;
+}
+#timeline {
+  width: 100%;
+  min-width: 600px;
+  height: 90px;
+  position: relative;
+  user-select: none;
+}
+#playBtn {
+  font-size: 1.5em;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 8px #000a;
+  transition: background 0.2s;
+}
+#playBtn:hover {
+  background: #555;
+}
+#musicFile {
+  font-size: 1em;
+}

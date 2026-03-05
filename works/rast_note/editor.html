@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>弾幕エディター</title>
+  <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+  <div id="editorRoot">
+    <div id="previewArea">
+      <canvas id="previewCanvas" width="680" height="400"></canvas>
+      <div id="inspector">
+        <h3>弾幕インスペクター</h3>
+        <label>発射時間 <input type="number" id="inspTime" step="0.01"></label><br>
+        <label>弾タイプ <select id="inspType"><option value="normal">normal</option><option value="bounce">bounce</option></select></label><br>
+        <label>起点 <select id="inspOrigin"><option value="center">center</option><option value="left">left</option><option value="right">right</option><option value="top">top</option><option value="bottom">bottom</option></select></label><br>
+        <label>相対X <input type="number" id="inspX"></label><br>
+        <label>相対Y <input type="number" id="inspY"></label><br>
+        <label>角度 <input type="number" id="inspAngle" step="0.01"></label><br>
+        <label>速度 <input type="number" id="inspSpeed" step="0.01"></label><br>
+        <label>色 <input type="color" id="inspColor" value="#ffffff"></label><br>
+        <button id="inspApply">適用</button>
+        <button id="inspDelete" style="margin-left:8px;">削除</button>
+      </div>
+      <div id="jsonOutput">
+        <h3>JSON出力</h3>
+        <textarea id="jsonText" readonly></textarea>
+        <button id="copyJson">コピー</button>
+      </div>
+    </div>
+    <div id="timelineArea">
+      <div id="timelineControls">
+        <div style="display:flex; align-items:center; justify-content:flex-start; gap:12px; flex:1;">
+          <input type="file" id="musicFile" accept="audio/*">
+          <input type="range" id="audioVolume" min="0" max="1" step="0.01" value="0.8" style="width:160px;">
+        </div>
+        <div style="flex:1; display:flex; justify-content:center; align-items:center;">
+          <button id="playBtn">▶</button>
+        </div>
+        <div style="flex:1;"></div>
+      </div>
+      <div id="timeline"></div>
+    </div>
+  </div>
+  <script src="js/editor.js"></script>
+</body>
+</html>
