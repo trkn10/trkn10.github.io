@@ -47,6 +47,50 @@
 
   // タイムライン描画
   function renderTimeline() {
+        // 波形描画（waveformApiからデータ取得）
+        if (window.waveformApi && window.waveformApi.getWaveformData) {
+          const waveformData = window.waveformApi.getWaveformData();
+          const wfDuration = window.waveformApi.getDuration ? window.waveformApi.getDuration() : duration;
+          let viewWidth = window.waveformApi.getViewWidth ? window.waveformApi.getViewWidth() : Math.min(30, wfDuration);
+          let scrollValue = window.waveformApi.getScrollValue ? window.waveformApi.getScrollValue() : 0;
+          let scrollMax = window.waveformApi.getScrollMax ? window.waveformApi.getScrollMax() : 1000;
+          let viewStart = 0;
+          if (wfDuration > viewWidth) {
+            const maxScroll = Math.max(0, wfDuration - viewWidth);
+            viewStart = (scrollValue / scrollMax) * maxScroll;
+          }
+          if (waveformData && waveformData.length > 0) {
+            const totalSamples = waveformData.length;
+            const startSample = Math.floor((viewStart / wfDuration) * totalSamples);
+            const endSample = Math.floor(((viewStart + viewWidth) / wfDuration) * totalSamples);
+            const viewData = waveformData.slice(startSample, endSample);
+            tctx.save();
+            tctx.strokeStyle = '#0ff';
+            tctx.beginPath();
+            // 波形をタイムライン中央基準で上下に広げる
+            const centerY = height / 2;
+            const amp = (height / 2) * 0.85; // 上下10%余白
+            for (let i = 0; i < viewData.length; i++) {
+              const x = (i / viewData.length) * width;
+              const y = centerY - (viewData[i] * amp);
+              if (i === 0) tctx.moveTo(x, y);
+              else tctx.lineTo(x, y);
+            }
+            // 下側も描画して塗りつぶし
+            for (let i = viewData.length - 1; i >= 0; i--) {
+              const x = (i / viewData.length) * width;
+              const y = centerY + (viewData[i] * amp);
+              tctx.lineTo(x, y);
+            }
+            tctx.closePath();
+            tctx.globalAlpha = 0.25;
+            tctx.fillStyle = '#0ff';
+            tctx.fill();
+            tctx.globalAlpha = 1;
+            tctx.stroke();
+            tctx.restore();
+          }
+        }
     // サイズを毎回同期
     ({ width, height } = syncCanvasSize());
     tctx.clearRect(0, 0, width, height);
@@ -72,6 +116,46 @@
     tctx.lineTo(width, height/2);
     tctx.stroke();
     tctx.restore();
+    // スクロールバー描画（長い曲のみ）
+    if (window.waveformApi && window.waveformApi.getDuration && window.waveformApi.getDuration() > 30) {
+      // シンプルなバーを下部に描画
+      const barY = height - 8;
+      const barH = 6;
+      const barW = width * 0.96;
+      const barX = width * 0.02;
+      tctx.save();
+      tctx.fillStyle = '#333';
+      tctx.fillRect(barX, barY, barW, barH);
+      // ハンドル
+      let scrollValue = window.waveformApi.getScrollValue ? window.waveformApi.getScrollValue() : 0;
+      let scrollMax = window.waveformApi.getScrollMax ? window.waveformApi.getScrollMax() : 1000;
+      let wfDuration = window.waveformApi.getDuration();
+      let viewWidth = window.waveformApi.getViewWidth ? window.waveformApi.getViewWidth() : 30;
+      const maxScroll = Math.max(0, wfDuration - viewWidth);
+      const handleW = Math.max(barW * (viewWidth / wfDuration), 32);
+      const handleX = barX + (barW-handleW) * (scrollValue/scrollMax);
+      tctx.fillStyle = '#0ff';
+      tctx.fillRect(handleX, barY, handleW, barH);
+      tctx.restore();
+    }
+      // タイムラインcanvas上でスクロールバー操作
+      timelineCanvas.addEventListener('mousedown', function(e) {
+        const rect = timelineCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const width = timelineCanvas.width;
+        const height = timelineCanvas.height;
+        if (window.waveformApi && window.waveformApi.getDuration && window.waveformApi.getDuration() > 30) {
+          const barY = height - 8;
+          if (y >= barY && y <= barY+8) {
+            // スクロールバークリック
+            let scrollMax = window.waveformApi.getScrollMax ? window.waveformApi.getScrollMax() : 1000;
+            let scrollValue = Math.round((x/width) * scrollMax);
+            window.waveformApi.setScrollValue(scrollValue);
+            if (window.timelineCanvasApi && window.timelineCanvasApi.renderTimeline) window.timelineCanvasApi.renderTimeline();
+          }
+        }
+      });
     // 弾幕ノード
     for (let i = 0; i < timelineData.length; ++i) {
       const b = timelineData[i];
