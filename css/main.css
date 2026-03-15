@@ -1,3 +1,8 @@
+/* クラフターズコロニーアイコンのダーク/ライトモード切替 */
+.crafters-colony-light { display: none !important; }
+.crafters-colony-dark { display: inline !important; }
+body:not(.dark-mode) .crafters-colony-light { display: inline !important; }
+body:not(.dark-mode) .crafters-colony-dark { display: none !important; }
 /* 安全性・注意事項案内セクション（ダークモード対応） */
 .safety-notice, section.safety-notice {
   background: #f8f8f8;
