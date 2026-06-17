@@ -1,11 +1,36 @@
 (function(){
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, function (char) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char];
+    });
+  }
+
+  function sanitizeUrl(url) {
+    const value = String(url || '').trim();
+    if (!value) return '#';
+    if (/^(https?:|mailto:|tel:|#|\/|\.\.\/|\.\/)/i.test(value)) {
+      return escapeHtml(value);
+    }
+    return '#';
+  }
+
   function easyMdParse(text) {
       let headings = [];
       let headingCount = 0;
+      const codeBlocks = [];
 
     text = text.replace(/```([\s\S]*?)```/g, function (_, code) {
-      return '<pre><code>' + code.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])) + '</code></pre>';
+      const token = `__EASY_MD_CODE_BLOCK_${codeBlocks.length}__`;
+      codeBlocks.push('<pre><code>' + escapeHtml(code) + '</code></pre>');
+      return token;
     });
+    text = escapeHtml(text);
     text = text.replace(/^###### (.*)$/gm, function(_, t) {
       headingCount++;
       const id = 'toc-h6-' + headingCount;
@@ -42,7 +67,9 @@
     text = text.replace(/^(\s*)- (.*)$/gm, '$1<li>$2</li>');
     text = text.replace(/(<li>.*<\/li>\n?)+/g, function (m) { return '<ul>' + m.replace(/\n/g, '') + '</ul>'; });
     // 画像
-    text = text.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" class="blog-img">');
+    text = text.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, function (_, alt, src) {
+      return '<img src="' + sanitizeUrl(src) + '" alt="' + escapeHtml(alt) + '" class="blog-img">';
+    });
     // 色付きテキスト
     const colorSpanRe = /\{\.(text-[a-z]+)\}([^\{\}]*)/g;
     let prev;
@@ -53,7 +80,12 @@
       });
     } while (text !== prev);
     // リンク
-    text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
+    text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, function (_, label, href) {
+      return '<a href="' + sanitizeUrl(href) + '">' + label + '</a>';
+    });
+    text = text.replace(/__EASY_MD_CODE_BLOCK_(\d+)__/g, function (_, index) {
+      return codeBlocks[Number(index)] || '';
+    });
     // 段落
     text = text.replace(/(^|\n)(?!<h\d|<ul|<li|<img|<pre|<span|<a|<\/ul|<\/li|<\/pre|<\/span|<\/a)([^\n]+)/g, function (_, br, line) {
       if (line.trim() === '') return '';
